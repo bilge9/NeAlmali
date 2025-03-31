@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeAlmalı - Kayıt Ol</title>
+    <link rel="stylesheet" href="css/register.css">
+    <script defer src="register.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="illustration">
+            <img src="/resim.jpeg" alt="Görsel">
+        </div>
+        <div class="form-container">
+            <h2>Hesap Oluştur</h2>
+            <form id="registerForm">
+                <label>Ad Soyad</label>
+                <input type="text" id="name">
+
+                <label>Email Adresi</label>
+                <input type="email" id="email">
+
+                <label>Şifre</label>
+                <div class="password-field">
+                    <input type="password" id="password" required>
+                    <span class="toggle-password" onclick="togglePassword('password')">👁</span>
+                </div>
+
+                <label>Şifre Tekrar</label>
+                <div class="password-field">
+                    <input type="password" id="confirmPassword" required>
+                    <span class="toggle-password" onclick="togglePassword('confirmPassword')">👁</span>
+                </div>
+                <button type="submit" class="register-btn">KAYIT OL</button>
+                <p>Zaten bir hesabın var mı? <!--sayfalar arası geçiş-->
+                    <a href="login.html" class="login-btn">GİRİŞ YAP</a>
+            </p>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
