@@ -1,236 +1,311 @@
 body {
-    font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.nav-container {
+  position: relative;
+}
+
+.gizlinavbar {
+  position: fixed;
+  width: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  width: 100%;
+}
+
+/* navbar */
+.topnav {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+.topnav .logo {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 0.325;
+}
+
+.search-bar input {
+  background-color: transparent;
+  border: 1.75px solid #1b0122;
+  color: #1b0122;
+  padding: 5px 10px;
+  font-size: 14px;
+  width: 100%;
+  padding-right: 40px;
+  border-radius: 30px;
+  flex-grow: 1;
+}
+
+.search-bar input:focus {
+  border-color: #1b0122;
+}
+
+.search-bar .input-group-text {
+  background-color: transparent;
+  border: none;
+  color: #1b0122;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  padding-right: 30px;
+  padding: 10px;
+  margin-left: -5px;
+}
+
+.icons-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  outline: none;
+}
+
+.icon-btn:hover {
+  background-color: #351d4d89;
+  color: rgb(24, 16, 16);
+}
+
+.carousel-indicators button {
+  background-color: #1b0122;
+}
+
+.carousel-indicators button.active {
+  background-color: #1b0122;
+}
+
+/* Carousel */
+.carousel-item img {
+  height: 600px;
+  object-fit: cover;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: #1b0122;
+}
+
+.carousel-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1; /* Carousel'i navbar'ın arkasında yapar */
+  margin-bottom: 25px;
+}
+
+/* Carousel item'larına fade animasyonu */
+.carousel-item {
+  opacity: 0; /* Başlangıçta resimler şeffaf olacak */
+  transition: opacity 1.5s ease; /* 1.5 saniye süresince opacity değişecek */
+}
+
+/* Eğer resim aktifse, tamamen görünür olacak */
+.carousel-item.active {
+  opacity: 1; /* Resim tamamen görünür */
+}
+
+/* Resimlerin geçişini daha yumuşak hale getirmek için fade animasyonu */
+.fade {
+  animation-name: fade;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  } /* Animasyon başlar başlamaz resim şeffaf olacak */
+  to {
+    opacity: 1;
+  } /* Animasyon bittiğinde resim tam görünür olacak */
+}
+
+.information-wrapper {
+  text-align: center;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.information-text-position {
+  letter-spacing: 0.2px;
+}
+
+.kampanya {
+  margin-bottom: 25px;
+}
+
+.kampanya-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.zoom {
+  padding: 50px;
+  border-radius: 10px;
+  background-color: #f04f53;
+  transition: transform 0.2s;
+  width: 500px;
+  height: 200px;
+  margin: auto;
+}
+
+.zoom:hover {
+  transform: scale(1.05);
+}
+
+.footer{
+  background-color: #161635;
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  height: 100%;
+  margin-left: 50px;
+}
+
+.footer-sütun {
+  display: flex;
+  flex: 1;
+  justify-content: space-around; /* Sütun içeriğini dikey olarak hizalar */
+  margin-left: 50px;
+  margin-top: 50px;
+}
+
+.sütun {
+  display: block;
+  width: 20%;
+  flex-direction: column; /* Başlık ve altındaki öğeleri dikey hizalar */
+  align-items: flex-start;
+  text-align: left;
+  word-wrap: break-word; /* Uzun kelimeler veya yazılar alt satıra geçer */
+  overflow-wrap: break-word;
+}
+
+.sütun a {
+  color: #e9e1eb;
+  text-decoration: none;
+}
+
+.sütun span,
+.sütun li {
+  word-wrap: break-word; /* Uzun kelimelerin alt satıra geçmesini sağlar */
+  overflow-wrap: break-word; /* Aynı amaçla uzun metinlerin taşmasını engeller */
+}
+
+.sütun #y {
+  color: #e9e1eb;
+}
+
+.sütun span {
+  color: #e9e1eb;
+  font-weight: bold;
+  text-decoration: none;
+  padding-left: 20px;
+}
+
+.sütun span:hover {
+  color: #ecc6c6;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+ul.baslik {
+  padding-left: 20px;
+  list-style-type: none; /* Liste işaretlerini kaldırır */
+}
+
+ul.baslik li {
+  margin-bottom: 50px;
+}
+
+
+.contact-info {
+  color: #e9e1eb;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.contact-info p{
+  padding-left: 20px;
+}
+
+.takip{
+  color: #e9e1eb;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.takip p{
+  padding-left: 20px;
+}
+
+
+/* Responsive düzenlemeler */
+@media (max-width: 768px) {
+
+  .search-bar{
+    width: 80%;
+    margin: 0 auto;
   }
-  
-  * {
-    box-sizing: border-box;
-  }
-  
-  .nav-container {
-    position:relative;
-  }
-  
-  .gizlinavbar {
-    position: fixed;    
-    width: auto;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    width: 100%;
-  }
-  
-  /* navbar */
-  .topnav {
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-  }
-  
-  .topnav .logo {
-    margin-left:20 px;
-    margin-right: 20px; 
-  }
-  
-  .search-bar {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 0.325;
-  }
-  @media (max-width: 768px) {
-    .search-bar {
-      width: 80%; /* Ekran boyutu küçüldüğünde %80 genişlik */
-    }
-  }
-  .search-bar input {
-    background-color: transparent;
-    border: 1.75px solid #1b0122;
-    color:#1b0122;
-    padding: 5px 10px;
-    font-size: 14px;
-    width: 100%;
-    padding-right: 40px;
-    border-radius:30px ; 
-    flex-grow: 1;
-  }
-  
-  .search-bar input:focus {
-    border-color:#1b0122;
-  }
-  
-  .search-bar .input-group-text {
-    background-color: transparent;
-    border: none;
-    color:#1b0122;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    padding-right: 30px;
-    padding: 10px;
-    margin-left: -5px;
-  }
-  .icons-container {
-    display: flex;
-    gap: 20px; 
-    align-items: center;
-  }
-  
-  .icon-btn {
-    background: none;
-    border: none;
-    font-size: 24px; 
-    cursor: pointer;
-    outline: none;
-  }
-  
-  .icon-btn:hover {
-    background-color: #351d4d89;
-    color: rgb(24, 16, 16);
-  }
-  
-  .carousel-indicators button{
-    background-color: #1b0122;
-    
-  }
-  .carousel-indicators button.active{
-    background-color: #1b0122;
-    
-  }
-  /* Carousel */
-  .carousel-item img {
-    height: 600px;
-    object-fit: cover;
-  }
-  
-  .carousel-control-prev-icon,
-  .carousel-control-next-icon {
-    background-color: #1b0122; 
-  }
-  
-  .carousel-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1; /* Carousel'i navbar'ın arkasında yapar */
-    margin-bottom: 25px;
-  }
-  /* Carousel item'larına fade animasyonu */
-  .carousel-item {
-    opacity: 0; /* Başlangıçta resimler şeffaf olacak */
-    transition: opacity 1.5s ease; /* 1.5 saniye süresince opacity değişecek */
-  }
-  
-  /* Eğer resim aktifse, tamamen görünür olacak */
-  .carousel-item.active {
-    opacity: 1; /* Resim tamamen görünür */
-  }
-  
-  /* Resimlerin geçişini daha yumuşak hale getirmek için fade animasyonu */
-  .fade {
-    animation-name: fade;
-    animation-duration: 1.5s;
-    animation-timing-function: ease-in-out;
-  }
-  
-  @keyframes fade {
-    from {opacity: 0;}  /* Animasyon başlar başlamaz resim şeffaf olacak */
-    to {opacity: 1;}    /* Animasyon bittiğinde resim tam görünür olacak */
-  }
-  
-  .information-wrapper{
-    text-align: center;  
-    margin-top: 25px;
-    margin-bottom: 25px;
-  }
-  .information-text-position{
-    letter-spacing: .2px;
-  }
-  #footter .footer-content{
-    background-color:#161635;
-  }
-  
-  
-  .kampanya{
-    margin-bottom: 25px;
-  }
-  .kampanya-container{
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-  }
-  .zoom {
-    padding: 50px;
-    border-radius: 10px;
-    background-color:#f04f53;
-    transition: transform .2s;
-    width: 500px;
-    height:200px;
-    margin: auto;
-  }
-  
-  .zoom:hover {
-    transform: scale(1.05); 
-  }
-  
-  .footer-content{
-    display: flex;
+
+  .kampanya-container {
     flex-direction: column;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
-    height: 100%;
+    gap: 20px;
   }
-  .footer-sütun{
-    display: flex;
-    flex:1;
-    justify-content: space-around;/* Sütun içeriğini dikey olarak hizalar */
-    margin-right: 20px;
-    margin-top: 50px;
+
+  .zoom {
+    width: 90%;
+    height: auto;
+    padding: 30px;
   }
-  .sütun{
-    display: block;
-    width: 20%;
-    flex-direction: column; /* Başlık ve altındaki öğeleri dikey hizalar */
-    align-items: flex-start;
-    text-align: left;
-    word-wrap: break-word; /* Uzun kelimeler veya yazılar alt satıra geçer */
-    overflow-wrap: break-word; 
+
+  .footer-sütun {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center; /* Sütunları yatay olarak ortalar */
   }
-  .sütun a{
-    color: #e9e1eb;
-    text-decoration:none;
+
+  .sütun {
+    width: 90%;
+    margin-bottom: 30px;
+    text-align: center;
   }
-  .sütun span,
-  .sütun li {
-    word-wrap: break-word; /* Uzun kelimelerin alt satıra geçmesini sağlar */
-    overflow-wrap: break-word; /* Aynı amaçla uzun metinlerin taşmasını engeller */
+
+  .sütun span {
+    padding-left: 0;
   }
-  .sütun #y{
-    color: #e9e1eb;
+
+  .carousel-item img {
+    height: auto; 
+    max-width: 100%; 
   }
-  .sütun span{
-    color:#e9e1eb;
-    font-weight: bold;
-    text-decoration:none;
-    margin-bottom: 50px;
-    padding-left: 20px;
-  }
-  ul.baslik {
-    padding-left: 20px;
-    list-style-type: none; /* Liste işaretlerini kaldırır */
-  }
-  
-  ul.baslik li {
-    margin-bottom: 50px;
-  }
-  .footer-content > .social-media,
-  .footer-content > p {
-    margin-top: auto; /* Bu kısmı aşağıya iter */
-  }
-  
+
+}
