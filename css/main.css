@@ -56,17 +56,33 @@ body {
 
 .search-bar .input-group-text {
   background-color: transparent;
-  border: none;
+  border: 1.75px solid #1b0122;
+  border-left: none;
   color: #1b0122;
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  padding-right: 30px;
-  padding: 10px;
-  margin-left: -5px;
+  padding: 5px 15px;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
 }
+
+.input-group .form-control {
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-right: none; /* Butonla birleşme hatası olmaması için */
+}
+
+.input-group .input-group-text {
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  border-left: none;
+  background-color: white;
+  border: 1.75px solid #1b0122;
+  border-left: none;
+}
+
 
 .icons-container {
   display: flex;
