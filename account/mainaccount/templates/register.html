@@ -1,11 +1,11 @@
+{%load static%}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeAlmalı - Kayıt Ol</title>
-    <link rel="stylesheet" href="css/register.css">
-    <script defer src="register.js"></script>
+    <link rel="stylesheet" href={% static "css/register.css" %}>
 </head>
 <body>
     <div class="container">
@@ -34,7 +34,7 @@
                 </div>
                 <button type="submit" class="register-btn">KAYIT OL</button>
                 <p>Zaten bir hesabın var mı? <!--sayfalar arası geçiş-->
-                    <a href="login.html" class="login-btn">GİRİŞ YAP</a>
+                    <a href={%url 'login_view'%} class="login-btn">GİRİŞ YAP</a>
             </p>
 
                 </div>
