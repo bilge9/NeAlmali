@@ -8,4 +8,7 @@ def register(request):
 
 def login_view(request):  # 'login' ismi Python'da gömülü olduğu için '_view' ekledik
     return render(request, 'login.html')
+
+def shopping(request):
+    return render(request, 'shopping.html')
 # Create your views here.
