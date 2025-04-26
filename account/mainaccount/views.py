@@ -11,4 +11,7 @@ def login_view(request):  # 'login' ismi Python'da gömülü olduğu için '_vie
 
 def shopping(request):
     return render(request, 'shopping.html')
+
+def shop_categories(request):
+    return render(request, 'shop_categories.html')
 # Create your views here.

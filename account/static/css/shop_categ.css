@@ -1,0 +1,153 @@
+.sayfa {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+}
+.cat-cap{
+    margin-top: 50px;
+    margin-left: 30px;
+}
+.sayfa-wrapper {
+    display: flex;
+    gap: 20px;
+    padding: 20px; 
+    margin-right: 50px;
+    margin-left: 50px;
+} 
+  /* Sol Filtre Paneli */
+
+.filter-sidebar {
+     border-radius: 10px;
+    width: 250px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    font-family: Arial, sans-serif;
+    align-self: flex-start;
+    height: fit-content; /* İçeriği kadar uzasın */
+    position: sticky;
+}
+  
+.filter-box {
+    margin-bottom: 30px;
+}
+  
+.filter-box h5 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+  
+.filter-list {
+    list-style: none;
+    padding: 0;
+}
+  
+.filter-list li {
+    font-size: 14px;
+    padding: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    cursor: pointer;
+}
+  
+.filter-list li:hover {
+    color: #000;
+}
+  
+.price-range {
+    width: 100%;
+    margin: 15px 0;
+}
+  
+.price-values {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #666;
+}
+  
+.filter-button {
+    width: 100%;
+    padding: 8px;
+    background-color: #ff4d4d;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+  
+.filter-button:hover {
+    background-color: #e60000;
+}
+  
+  /* Ürünler Alanı */
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 3 ürün yan yana */
+    gap: 20px;
+    flex: 1;
+}
+.product-wrap{
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;  
+    text-align: left;
+    transition: 0.3s;
+    height: 375px;
+    
+}
+.product-wrap:hover {
+    box-shadow: 0 2px 13px rgba(0,0,0,0.1);
+}
+.product-img{
+    width: 100%;
+    height: 270px;
+    overflow: hidden;
+    margin-bottom: 5px;
+    object-position: center;
+    position: relative;
+   
+}
+.product-img img{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.25s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.product-img .hover-img {
+  opacity: 0;
+}
+  
+.product-img:hover .hover-img {
+  opacity: 1;
+}
+  
+.product-img:hover .main-img {
+  opacity: 0;
+}
+.product-info{
+    margin-bottom: 5px;
+    margin-top: 0px;
+    margin-left: 3px;
+}
+.product-wrap .rating{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.product-wrap .urun-baslik{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+}
+
+.product-wrap h6 {
+    margin: 5px 0 5px;
+}
+  
