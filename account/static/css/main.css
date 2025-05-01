@@ -1,5 +1,6 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
+  
 }
 
 .nav-container {
@@ -18,7 +19,7 @@ body {
 
 /* navbar */
 .topnav {
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -96,6 +97,43 @@ body {
   font-size: 24px;
   cursor: pointer;
   outline: none;
+  display: flex;
+}
+
+.icons-btn.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  background-color: transparent;
+  display: none;
+  position: absolute;
+  top: 35px; 
+  left: -20px; 
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 150px;
+  z-index: 1000;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #000;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+}
+
+.dropdown-content a:hover {
+  background-color: #fadbdb;
+  color: #000;
+  border-radius: 8px ;
+}
+
+/* Hover ile açılma */
+.icons-btn.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 .icon-btn:hover {

@@ -14,6 +14,7 @@ body {
 .container {
     display: flex;
     width: 800px;
+    height: 500px;
     background: #f890a055;
     border-radius: 10px;
     overflow: hidden;
@@ -28,13 +29,17 @@ body {
 }
 
 .illustration img {
-    width: 112%;
-    height: 120%;
+    width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .form-container {
     width: 50%;
     padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 form {
@@ -45,6 +50,7 @@ form {
 label {
     margin-top: 10px;
     font-weight: bold;
+    font-size: 14px;
 }
 
 input {
@@ -69,15 +75,25 @@ input {
     color: #3e0127;
 }
 
-.register-btn, .login-btn {
+button {
     margin-top: 15px;
     padding: 10px;
     border: none;
     border-radius: 5px;
-    font-size: 16px;
     cursor: pointer;
-    width: calc(100% - 20px);
-    transition: 0.3s ease;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+ .login-btn {
+    display: inline-block;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none; 
+    background-color: #ddd;
+    color: black;
+    border-radius: 5px;
+    width: 100%; 
 }
 
 .register-btn {
@@ -87,16 +103,9 @@ input {
 }
 .register-btn:hover {
     background-color: #ff3366;
-    color: white;
-    box-shadow: 0 4px 10px rgba(255, 102, 153, 0.6);
 }
 
-.login-btn {
-    background-color: #ddd;
-    color: black;
-    text-decoration: none;
-}
 .login-btn:hover {
-    background-color: #ff3366;
-    box-shadow: 0 4px 10px rgba(255, 102, 153, 0.6);
+    background-color: #ff6699;
+    color: white;
 }

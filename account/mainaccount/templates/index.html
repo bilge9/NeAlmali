@@ -14,6 +14,79 @@
 </head>
 
 <body>
+
+  {% if messages %}
+    <div id="toastContainer">
+        {% for message in messages %}
+            <div class="toast-message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <style>
+      #toastContainer {
+          position: fixed;
+          top: 20px;  /* Sayfanın üstünden 20px mesafe */
+          left: 50%;
+          transform: translateX(-50%);  /* Ortalamak için */
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+
+      .toast-message {
+          background-color: #fff;
+          border-left: 8px solid #28a745; /* Yeşil - success */
+          color: #000;
+          padding: 20px 25px;
+          margin-top: 15px;
+          border-radius: 12px;
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+          min-width: 300px;
+          font-weight: bold;
+          font-size: 18px; /* Daha büyük yazı boyutu */
+          animation: fadeInOut 5s forwards;
+          opacity: 0; /* Başlangıçta gizle */
+          transform: translateY(-30px); /* Başlangıç pozisyonu */
+      }
+
+      /* Hata mesajı stili */
+      .toast-message.error {
+          border-left-color: #dc3545; /* Kırmızı - error */
+          background-color: #f8d7da; /* Hafif kırmızı arka plan */
+          color: #721c24; /* Koyu kırmızı yazı */
+      }
+
+      /* Bilgi mesajı stili */
+      .toast-message.info {
+          border-left-color: #17a2b8; /* Mavi - info */
+          background-color: #d1ecf1; /* Hafif mavi arka plan */
+          color: #0c5460; /* Koyu mavi yazı */
+      }
+
+      /* Animasyon: FadeIn ve FadeOut */
+      @keyframes fadeInOut {
+          0% {
+              opacity: 0;
+              transform: translateY(-30px); /* Üstten gelmesini sağlar */
+          }
+          10% {
+              opacity: 1;
+              transform: translateY(0); /* Mesajın normal konumuna gelmesi */
+          }
+          90% {
+              opacity: 1;
+          }
+          100% {
+              opacity: 0;
+              transform: translateY(-30px); /* Yine üstten kaybolmasını sağlar */
+          }
+      }
+    </style>
+  {% endif %}
+
   <div class="nav-container">
     <div class="gizlinavbar">
       <div class="topnav">
@@ -36,10 +109,21 @@
 
         <!--İkonlar-->
         <div class="icons-container">
-
-          <a href={% url 'register'%} class="icon-btn" style="color: black;">
-            <i class="bi bi-person"></i> <!-- Kullanıcı simgesi -->
-          </a>
+          
+          <button class="icon-btn">
+            <div class="icons-btn dropdown">
+              <i class="bi bi-person"></i>
+              <div class="dropdown-content">
+                {% if user.is_authenticated %}
+                  <a href="#">Hoşgeldiniz, {{ user.first_name }}</a>
+                  <a href="{% url 'logout_view' %}">Çıkış Yap</a>
+                {% else %}
+                  <a href="{% url 'login_view' %}">Giriş Yap</a>
+                  <a href="{% url 'register' %}">Kayıt Ol</a>
+                {% endif %}
+              </div>
+            </div>
+          </button>
 
           <button class="icon-btn">
             <i class="bi bi-bell"></i>

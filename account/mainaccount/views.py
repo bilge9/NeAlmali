@@ -1,14 +1,71 @@
-from django.shortcuts import render
+from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate, logout
+from django.contrib import messages
+from django.views.decorators.cache import never_cache
+from django.shortcuts import render, redirect
 from .models import Product, Category
 
 def index(request):
     return render(request, 'index.html')
 
+@never_cache
 def register(request):
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        print(f"Formdan gelen bilgiler: {full_name}, {email}, {password}")  # Debug
+        if password != confirm_password:
+            messages.error(request , 'Şifreler eşleşmiyor.')
+            return redirect('register')
+        
+        if User.objects.filter(username=email).exists():
+            messages.error(request, 'Bu e-posta adresiyle bir kullanıcı zaten var.')
+            return redirect('register')
+        
+        name_parts = full_name.split(" ", 1)
+        first_name = name_parts[0]
+        last_name = name_parts[1] if len(name_parts) > 1 else ""
+
+        user = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name
+        )
+        
+
+        login(request, user)
+        messages.success(request, 'Başarıyla kaydoldunuz.')
+        return redirect('index')
+
     return render(request, 'register.html')
 
+@never_cache
 def login_view(request):  # 'login' ismi Python'da gömülü olduğu için '_view' ekledik
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None:
+            login(request, user)
+            messages.success(request, 'Başarıyla giriş yaptınız.')
+            return redirect('index')
+        else:
+            messages.error(request, 'Geçersiz e-posta veya şifre.')
+            return redirect('login_view')
+
     return render(request, 'login.html')
+
+def logout_view(request):
+    logout(request)  
+    messages.success(request, "Başarıyla çıkış yaptınız!")  
+    return redirect('index')
 
 def shopping(request):
     return render(request, 'shopping.html')
