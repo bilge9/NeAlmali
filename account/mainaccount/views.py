@@ -67,6 +67,8 @@ def logout_view(request):
     messages.success(request, "Başarıyla çıkış yaptınız!")  
     return redirect('index')
 
+
+
 def shopping(request):
     return render(request, 'shopping.html')
 
@@ -107,3 +109,12 @@ def product_list(request):
         'max_price': max_price,
     }
     return render(request, 'shopping.html', context)
+
+def forum(request):
+    return render(request, 'forum.html')
+
+def forum_caption(request):
+    return render(request, 'forum_caption.html')
+
+def product_info(request):
+    return render(request, 'product_info.html')
