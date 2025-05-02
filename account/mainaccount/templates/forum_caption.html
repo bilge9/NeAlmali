@@ -1,0 +1,257 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Forum Başlığı</title>
+  <link rel="stylesheet" href={% static 'css/forum_caption.css'%} />
+</head>
+<body>
+<!--bu kod forum sayfasında tıklanılan başlık sayafasına götüren sayfa aslında ama düzenlenmesi lazım çok karışık.-->
+<!--script dosyasını ayırmadım bunun en altında açıklamaları yazıcam-->
+
+<div class="main-container"><!--burdan aşağısı sayfanın genel tasarımı navbar ve kenarları falan doldurulmalı-->
+  <!-- Sol: Cevaplar -->
+  <div class="left-content">
+    <h1 class="thread-title">Forum Başlığı: Yazılımda En Sevdiğiniz Dil Nedir?</h1>
+
+    <div id="replyList" class="reply-list">
+      <!-- Cevap Kutusu -->
+      <div class="reply-box">
+        <div class="user-info">
+          <img src="https://via.placeholder.com/50" alt="Avatar" />
+          <p class="username">kullanici123</p>
+        </div>
+        <div class="reply-content">
+          <p>Python çok güçlü ve öğrenmesi kolay bir dil.</p>
+          <div class="reply-actions">
+            <button onclick="showReplyForm('kullanici123', this)">💬 Cevapla</button><!--burda reply atabiliyorz-->
+            <button>👍 4</button>
+            <button>👎 0</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alt Genel Cevap Formu -->
+    <div class="bottom-reply-form"><!--bura genel cevap vermek istersek onun için olan kısım-->
+        <form id="mainReplyForm" onsubmit="handleMainReply(event)">
+          <textarea id="mainReplyText" name="content" placeholder="Bu başlığa bir cevap yazın..." required></textarea>
+          <button type="submit">Gönder</button>
+        </form>
+        <div id="replyNotification" class="reply-notification" style="display: none;">
+          ✔️ Cevabınız gönderildi
+        </div>
+      </div>
+
+
+
+   <form id="mainReplyForm" onsubmit="handleMainReply(event)">
+  <!-- Cevapla popup kutusu --><!--cevaplaya tıklayınca açılan menü -->
+  <div class="popup-reply-form" id="popupReplyForm" style="display: none;">
+    <div class="popup-header">
+      <span>Cevap Yaz</span>
+      <button class="close-btn" onclick="closeReplyPopup()">✖</button>
+    </div>
+    <div class="reply-reference" id="replyRef"></div>
+    <textarea id="replyText" placeholder="Cevabınızı yazın..."></textarea>
+    <button onclick="submitReply()">Gönder</button>
+  </div>
+  
+  
+
+  </div>
+    <!-- Sağ: Yeni Konular -->
+  <div class="right-sidebar"><!--sağı doldurabiliriz böyle menülerle-->
+        <h3>Yeni Konular</h3>
+        <ul class="topic-list">
+          <li><a href="#">Vue vs React: Hangisi?</a></li>
+          <li><a href="#">En İyi Python Kütüphaneleri</a></li>
+          <li><a href="#">VSCode Eklenti Önerileri</a></li>
+          <li><a href="#">Django Başlangıç Rehberi</a></li>
+        </ul>
+       <!-- Yeni Başlık Dropdown Butonu -->
+  <div class="new_topic">
+    <button onclick="toggleTopicForm()">+ Yeni Konu</button>
+  </div>
+  
+  <!-- Açılır Yeni Başlık Formu --><!--burayı tamamlamadım yeni başlık oluşturma formu butona basınca pencere açılıyor. bunu sağdan açılan menü gibi yapabiliriz belki-->
+  <div id="topicForm" class="dropdown-form" style="display: none;">
+    <div class="form-header">
+      <span>Yeni Başlık Oluştur</span>
+      <button onclick="toggleTopicForm()">✖</button>
+    </div>
+  
+    <input type="text" placeholder="Başlık" id="topicTitle" required />
+  
+    <textarea placeholder="Konu içeriği..." id="topicContent" required></textarea>
+  
+    <select id="topicCategories" multiple>
+      <option value="elektronik">Elektronik</option>
+      <option value="moda">Moda</option>
+      <option value="kitap">Kitap</option>
+      <option value="oyuncak">Oyuncak</option>
+      <!-- veritabanından dinamik olarak da çekilebilir -->
+    </select>
+  
+    <input type="file" id="topicFile" />
+  
+    <input type="text" placeholder="Ürün adıyla ara..." id="productSearch" />
+  
+    <button onclick="submitTopic()">Gönder</button>
+  </div>
+  
+  
+  <script>// java kodlarını henüz ayırmadım bir şey kesinleşmediği için
+
+  function toggleTopicForm() {
+    const form = document.getElementById('topicForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  }
+  
+  function submitTopic() {
+    const title = document.getElementById('topicTitle').value;
+    const content = document.getElementById('topicContent').value;
+    const categories = Array.from(document.getElementById('topicCategories').selectedOptions).map(opt => opt.value);
+    const product = document.getElementById('productSearch').value;
+  
+    console.log("Yeni Başlık:", { title, content, categories, product });
+  
+    // Daha sonra veri tabanına gönderilebilir:
+    // fetch('/api/baslik-ekle/', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ title, content, categories, product })
+    // });
+  
+    toggleTopicForm();
+  }
+  </script>
+  
+    </div>
+    
+</div>
+<!-- Gizli Cevap Formu -->
+
+
+
+  <script>//gpt bunları böyle yapmış  bende yapıştımırmışım 
+    let insertAfterElement = null;
+    
+    // Ana formdan başlığa direkt cevap ekleme
+    function handleMainReply(event) {
+      event.preventDefault();
+      const textarea = document.getElementById('mainReplyText');
+      const text = textarea.value.trim();
+      if (!text) return;
+    
+      const newReply = createReplyBox("me", text);
+      document.getElementById('replyList').appendChild(newReply);
+      textarea.value = '';
+    
+      const notification = document.getElementById('replyNotification');
+      notification.style.display = 'block';
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 4000);
+    
+      // Veri tabanı için gönderme yapılabilir:
+      // fetch('/api/yorum-ekle/', {...});
+    }
+    
+    // Cevapla butonuna tıklandığında kutu göster
+    function showReplyForm(username, btn) {
+    const parentBox = btn.closest('.reply-box');
+    const messageHTML = getFullReplyChain(parentBox);
+
+    const form = document.getElementById('popupReplyForm');
+    const replyRef = document.getElementById('replyRef');
+    const textarea = document.getElementById('replyText');
+    insertAfterElement = parentBox;
+
+    replyRef.innerHTML = messageHTML;
+    textarea.value = `@${username} `;
+    form.style.display = 'block';
+    textarea.focus();
+    }
+
+    function closeReplyPopup() {
+     document.getElementById('popupReplyForm').style.display = 'none';
+     document.getElementById('replyRef').innerHTML = '';
+     document.getElementById('replyText').value = '';
+     insertAfterElement = null;
+    }
+    
+    function getFullReplyChain(replyElement) {
+    if (!replyElement || !replyElement.classList.contains('reply-box')) return '';
+
+    const username = replyElement.querySelector('.username')?.innerText || 'Kullanıcı';
+    const message = replyElement.querySelector('.reply-content > p')?.innerText || '';
+
+    // Önceki cevabın içindeki cevabı bul (eğer varsa)
+    const nested = replyElement.querySelector('.reply-reference-inner');
+    const nestedHTML = nested ? nested.innerHTML : '';
+
+    return `
+      <div class="reply-reference-inner">
+       ${nestedHTML}
+        <div class="reply-quote">
+          <strong>@${username}</strong> dedi ki:<br />
+          ${message}
+        </div>
+      </div>
+    `;
+      }
+
+
+
+    
+    // Cevapla penceresinden gönderme
+    function submitReply() {
+    const textarea = document.getElementById('replyText');
+    const text = textarea.value.trim();
+    if (!text) return;
+
+    const replyRef = document.getElementById('replyRef');
+    const nestedHTML = replyRef.innerHTML;
+
+    const newReply = createReplyBox("me", text, nestedHTML);
+
+    if (insertAfterElement) {
+      insertAfterElement.insertAdjacentElement('afterend', newReply);
+    } else {
+      document.getElementById('replyList').appendChild(newReply);
+    }
+
+    closeReplyPopup();
+      }
+
+
+    // Ortak reply kutusu oluşturucu bu önceki replyi de beraberinde tutarak bir verilen replyleri alt alta tutuyo gibi
+    function createReplyBox(username, content, nestedHTML = '') {
+    const reply = document.createElement('div');
+    reply.classList.add('reply-box');
+    reply.innerHTML = `
+      <div class="user-info">
+        <img src="https://via.placeholder.com/50" alt="Avatar" />
+        <p class="username">${username}</p>
+      </div>
+      <div class="reply-content">
+        ${nestedHTML ? `<div class="nested-reply">${nestedHTML}</div>` : ''}
+        <p>${content}</p>
+        <div class="reply-actions">
+          <button onclick="showReplyForm('${username}', this)">💬 Cevapla</button>
+          <button>👍 0</button>
+          <button>👎 0</button>
+        </div>
+      </div>
+    `;
+    return reply;
+      }
+
+    </script>
+    
+
+</body>
+</html>

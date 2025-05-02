@@ -87,3 +87,37 @@ leftBtn.addEventListener('click', () => {
 const sliderContainer = document.querySelector('.slider-container');
 sliderContainer.addEventListener('mouseenter', stopAutoSlide);
 sliderContainer.addEventListener('mouseleave', startAutoSlide);
+
+document.getElementById('dahaFazlaBtn').addEventListener('click', function() {
+  var gizliBasliklar = document.getElementById('dahaFazlaBaslik');
+  if (gizliBasliklar.style.display === 'none') {
+    gizliBasliklar.style.display = 'block';
+    this.textContent = 'Daha Az Göster';
+  } else {
+    gizliBasliklar.style.display = 'none';
+    this.textContent = 'Daha Fazla Göster';
+  }
+});
+
+
+//forum kısmının kodları bunun için dediğim gibi karışıklık olmasın diye forum.js açmadım şuan
+const banner = document.getElementById('banner');
+let ticking = false;
+
+function updateBanner() {
+  const scrollY = window.scrollY;
+
+  let height = 300 - scrollY;
+  if (height < 80) height = 80;
+  if (height > 300) height = 300;
+
+  banner.style.height = `${height}px`;
+  ticking = false;
+}
+
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    window.requestAnimationFrame(updateBanner);
+    ticking = true;
+  }
+});

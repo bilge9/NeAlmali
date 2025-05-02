@@ -156,12 +156,12 @@
 
       <div class="carousel-item" data-bs-interval="2000">
         <a href={% url 'shopping' %}>
-          <img src={%static 'pictures/shopgo.png' %} class="d-block w-100 carousel-img " alt="..." width="500" height="350">
+          <img src={% static 'pictures/shopgo.png' %} class="d-block w-100 carousel-img " alt="..." width="500" height="350">
         </a>
       </div>
 
       <div class="carousel-item active" data-bs-interval="2000">
-        <a href="forum.html">
+        <a href={% url 'forum' %}>
           <img src="pictures/forum.png" class="d-block w-100 carousel-img  " alt="..." width="500" height="350">
         </a>
       </div>

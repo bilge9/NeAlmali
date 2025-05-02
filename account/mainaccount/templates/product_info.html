@@ -1,0 +1,214 @@
+{% load static %}
+<!DOCTYPE html><!-- burayı hiç ellemedim sadece css bağlantılarını falan yaptım-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ürün</title>
+  <link rel="stylesheet" href={% static 'css/main.css' %}>
+  <link rel="stylesheet" href={% static 'css/forum.css' %}>
+  <link rel="stylesheet" href={% static 'css/shop.css' %}>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .product-container {
+      max-width: 1200px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+    .thumb-img {
+      cursor: pointer;
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin-right: 10px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .thumb-img:hover {
+      border: 2px solid #000;
+    }
+    .thumb-scroll {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .thumb-scroll img {
+      display: inline-block;
+    }
+    .main-img {
+      width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      cursor: zoom-in;
+    }
+    .main-img:hover {
+      transform: scale(1.05);
+    }
+  </style>
+  <style>
+    .comment-form {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-family: sans-serif;
+    }
+  
+    .comment-form h3 {
+      margin-bottom: 20px;
+    }
+  
+    .comment-form label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  
+    .comment-form input[type="text"],
+    .comment-form select,
+    .comment-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #999;
+      border-radius: 4px;
+    }
+  
+    .comment-form input[type="file"] {
+      margin-top: 5px;
+    }
+  
+    .comment-form button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #3366cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  
+    .comment-form button:hover {
+      background-color: #254a99;
+    }
+  </style>
+  
+</head>
+
+<body>
+
+
+  <div class="container product-container">
+  <div class="row">
+
+    <!-- Ana Fotoğraf -->
+    <div class="col-md-6 text-center">
+      <a href="pictures/comp.jpg" target="_blank">
+        <img id="mainProductImage" src={% static 'pictures/imageplaceholder.png' %} class="main-img" alt="Ana Fotoğraf">
+      </a>
+      <div class="thumb-scroll mt-3">
+        <img src="pictures/shopbanner.png" class="thumb-img" onclick="changeImage('pictures/shopbanner.png')">
+        <img src={% static 'pictures/imageplaceholder.png' %} class="thumb-img" onclick="changeImage('pictures/saat.jpg')">
+        <img src="pictures/saat.jpg" class="thumb-img" onclick="changeImage('pictures/saat.jpg')">
+        <img src="pictures/saat.jpg" class="thumb-img" onclick="changeImage('pictures/saat.jpg')">
+      </div>
+    </div>
+
+    <!-- Ürün Bilgileri -->
+    <div class="col-md-6">
+      <h2>GRANAIG</h2>
+      <p class="text-muted">Robe Nuit</p>
+      <h4>250 €</h4>
+
+      <button class="btn btn-dark w-100 mb-3">Sepete Ekle</button>
+
+      <h5>Açıklama</h5>
+      <p>Bu şık elbise, günlük kullanım ve özel davetler için idealdir. Yüksek kaliteli kumaşı ile rahat ve şık.</p>
+
+      <ul class="list-unstyled">
+        <li><strong>Renk:</strong> Siyah</li>
+        <li><strong>Materyal:</strong> %100 Pamuk</li>
+        <li><strong>Stok:</strong> Mevcut</li>
+      </ul>
+    </div>
+
+  </div>
+  </div>
+  <div class="bottom-reply-form"><!--bura genel cevap vermek istersek onun için olan kısım-->
+    <form id="mainReplyForm" onsubmit="handleMainReply(event)">
+      <textarea id="mainReplyText" name="content" placeholder="Bu başlığa bir cevap yazın..." required></textarea>
+      <button type="submit">Gönder</button>
+    </form>
+    <div id="replyNotification" class="reply-notification" style="display: none;">
+      ✔️ Cevabınız gönderildi
+    </div>
+  </div>
+  <form class="comment-form" method="POST" enctype="multipart/form-data" action="/yorum-ekle/">
+    <h3>Yorum Yap</h3>
+  
+    <label for="username">Adınız (isteğe bağlı)</label>
+    <input type="text" id="username" name="username" placeholder="Adınızı girin">
+  
+    <label for="product_rating">Ürün Puanı</label>
+    <select id="product_rating" name="product_rating" required>
+      <option value="">Seçiniz</option>
+      <option value="5">5 - Mükemmel</option>
+      <option value="4">4 - İyi</option>
+      <option value="3">3 - Orta</option>
+      <option value="2">2 - Kötü</option>
+      <option value="1">1 - Berbat</option>
+    </select>
+  
+    <label for="seller_rating">Satıcı Puanı</label>
+    <select id="seller_rating" name="seller_rating" required>
+      <option value="">Seçiniz</option>
+      <option value="5">5 - Harika</option>
+      <option value="4">4 - İyi</option>
+      <option value="3">3 - Orta</option>
+      <option value="2">2 - Zayıf</option>
+      <option value="1">1 - Kötü</option>
+    </select>
+  
+    <label for="comment">Yorumunuz</label>
+    <textarea id="comment" name="comment" rows="5" placeholder="Deneyiminizi yazın..." required></textarea>
+  
+    <label for="images">Fotoğraf Ekle (isteğe bağlı)</label>
+    <input type="file" id="images" name="images" accept="image/*" multiple>
+  
+    <button type="submit">Yorumu Gönder</button>
+  </form>
+
+<script>
+  let insertAfterElement = null;
+
+  function changeImage(imageSrc) {
+    document.getElementById('mainProductImage').src = imageSrc;
+    document.querySelector('#mainProductImage').parentElement.href = imageSrc;
+  }
+  function showReplyForm(username, btn) {
+    const parentBox = btn.closest('.reply-box');
+    const messageHTML = getFullReplyChain(parentBox);
+
+    const form = document.getElementById('popupReplyForm');
+    const replyRef = document.getElementById('replyRef');
+    const textarea = document.getElementById('replyText');
+    insertAfterElement = parentBox;
+
+    replyRef.innerHTML = messageHTML;
+    textarea.value = `@${username} `;
+    form.style.display = 'block';
+    textarea.focus();
+    }
+</script>
+<script src={% static 'main.js' %}></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
