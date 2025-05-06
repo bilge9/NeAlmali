@@ -1,19 +1,73 @@
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 0.325;
+  }
+  
+  .search-bar input {
+  background-color: transparent;
+  border: 1.75px solid #1b0122;
+  color: #1b0122;
+  padding: 5px 10px;
+  font-size: 14px;
+  width: 100%;
+  padding-right: 40px;
+  border-radius: 30px;
+  flex-grow: 1;
+  }
+  
+  .search-bar input:focus {
+  border-color: #1b0122;
+  }
+  
+  .search-bar .input-group-text {
+  background-color: transparent;
+  border: 1.75px solid #1b0122;
+  border-left: none;
+  color: #1b0122;
+  padding: 5px 15px;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  }
+  
+  .input-group .form-control {
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-right: none; /* Butonla birleşme hatası olmaması için */
+  }
+  
+  .input-group .input-group-text {
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  border-left: none;
+  background-color: transparent;
+  border: 1.75px solid #1b0122;
+  border-left: none;
+  }
+ 
  /* Sol ve sağ kısmı ayıran çizgi */
 
  .border-end-md {
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid #a092b1;
   }
 
   /* List-group hover efekti */
   .list-group-item:hover {
-    background-color: #165ea6;
+    background-color: 	#d8bfd8;
     transition: background-color 0.3s;
   }
 
   /* Sağ taraf başlıkları kart gibi */
   .sidebar-section {
-    background: #8f1818;
-    border: 1px solid #dee2e6;
+    color: #ffffff;
+    background: #48385b;
+    border: 1px solid #a092b1;
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
@@ -26,9 +80,10 @@
     margin-bottom: 15px;
   }
   .forum-container{
+    background-color: #bda8d7;
     margin: 100px;
     margin-top: 320px;
-    border: 1px solid #eee;
+    border: 1px solid #bda8d7;
     border-radius:8px;
     padding: 10px;
   }
@@ -116,12 +171,52 @@
 .category-card:hover .category-info {
   bottom: 0;
 }
+/* Tüm liste öğesine arka plan ve hover efekti */
 .list-group-item {
-  position: relative;
+  background-color: #f9f9ff; /* açık morumsu beyaz */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: background-color 0.3s ease;
 }
-.badge {
-  font-size: 12px;
+
+.list-group-item:hover {
+  background-color: #33337d; /* lavanta rengi hover */
+}
+
+/* Başlık (h5) */
+.list-group-item h5 {
+  color: #4b0082; /* koyu mor */
+  font-weight: bold;
+}
+
+/* Açıklama metni */
+.list-group-item p {
+  color: #333;
+}
+
+/* Sağ alt köşe simgeleri (beğeni, göz) */
+.list-group-item .text-muted i {
+  margin-right: 5px;
+  color: #6c757d;
+}
+
+/* Badge (kategori etiketi) */
+.list-group-item .badge {
+  font-size: 0.75rem;
   padding: 5px 10px;
+}
+
+/* Yazar ismi */
+.list-group-item small.text-body-secondary {
+  color: #6f42c1; /* mor ton */
+}
+
+.badge {
+  font-size: 13px;
+  padding: 5px 10px;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .w-75 {
@@ -135,14 +230,60 @@
 }
 
 @media (max-width: 576px) {
-  .list-group-item .d-flex.flex-md-row {
-    flex-direction: column !important;
-    align-items: flex-start !important;
+  .list-group-item .d-flex.justify-content-between {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .list-group-item .d-flex.align-items-center.gap-3 {
+    margin-top: 10px;
   }
 }
-.badge {
-  white-space: nowrap;
-  font-size: 13px;
-  display: inline-block;
+/* Başlık Açma Formu Stili */
+
+button.custom-btn {
+  background-color: #a55a98;
+  border-color: #9a5d8c;     /* Hover'da kenarlık rengi */
+  transform: translateY(-2px); /* Hafif yukarı zıplatma efekti */
+  box-shadow: 0 4px 8px rgba(36, 0, 42, 0.15);
 }
 
+/* Başlık açma formunu kutu gibi yapmak için */
+.create-topic-form {
+  background-color: #bda8d7 !important;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  max-width: 90%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+
+.create-topic-form .card-header {
+  background-color: transparent;
+  border-bottom: none;
+}
+
+.create-topic-form .form-label {
+  font-weight: bold;
+  color: #4b4b4b;
+}
+
+.create-topic-form .btn {
+  background-color: #B76BA3;
+  color: white;
+  border: none;
+  transition: 0.3s;
+}
+
+.create-topic-form .btn:hover {
+  background-color: #a25694;
+}
+
+h5 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}

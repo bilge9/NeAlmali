@@ -20,29 +20,22 @@
 
 </head>
 <body>
-
+  
     {% block message %}{% endblock message %}
+
+    
     
     <div class="nav-container">
         <div class="gizlinavbar">
             <div class="topnav">
             <div class="logo">
+              
                 <a href={% url 'index' %} class="logo">
                 <img src="/NeAlmalıLogo.png" alt="logo" style="height: 80px;">
                 </a>
+                
             </div>
-    
-            <!-- Arama çubuğu -->
-            <div class="search-bar">
-                <div class="input-group">
-                <input type="text" class="form-control" placeholder="" aria-label="Search">
-                <button class="input-group-text">
-                    <i class="bi bi-search"></i>
-                </button>
-    
-                </div>
-            </div>
-    
+            {%block search-bar%}{%endblock search-bar%}
             <!--İkonlar-->
             <div class="icons-container">
                 
