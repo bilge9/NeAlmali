@@ -30,141 +30,31 @@
     </div>
 
     <div class="kategori-container"><!-- kategoriler kısmı-->
-  
-      <div class="kategori-kutu-dropdown">
-        <div class="kategori-kutu">Elektronik</div>
-        <div class="mega-menu">
-
-          <div class="mega-column">
-            <h4> <a href="#">Telefon</a></h4>
-          </div>
-          <div class="mega-column">
-            <h4> <a href="#">Bilgisayar</a></h4>
-          </div>
-          
-          <div class="mega-column">
-            <h4>Ev Eşyası</h4>
-            <a href="#">Televizyon</a>
-            <a href="#">Mutfak</a>
-            <a href="#">Beyaz Eşya</a>
-          </div>
-          <div class="mega-column">
-            <h4>Elektronik Aksesuarları</h4>
-            <a href="#">Kılıf</a>
-            <a href="#">Kulaklık</a>
-            <a href="#">Hoparlör</a>
-            <a href="#">Çanta</a>
-            <a href="#">Şarj Aletleri</a>
-          </div>
-        </div>
-      </div>
-      <div class="kategori-kutu-dropdown">
-        
-        <div class="kategori-kutu">
-          <a href={% url 'shop_categories' %}>Moda</a>
-        </div>
-        <div class="mega-menu">
-  
-          <div class="mega-column">
-            <h4>Giyim</h4>
-            <a href="#">Tişört</a>
-            <a href="#">Gömlek</a>
-            <a href="#">Kazak</a>
-            <a href="#">Mont</a>
-            <a href="#">ceket</a>
-            <a href="#">Mont</a>
-            <a href="#">Pantolon</a>
-            <a href="#">Şort</a>
-            <a href="#">Etek</a>
-            <a href="#">Elbise</a>
-            <a href="#">Pijama</a>
-          </div>
-          <div class="mega-column">
-            <h4>Ayakkabı</h4>
-            <a href="#">Sneaker</a>
-            <a href="#">Bot</a>
-            <a href="#">Terlik</a>
-          </div>
-          <div class="mega-column">
-            <h4>Aksesuar</h4>
-            <a href="#">Saat</a>
-            <a href="#">Takı</a>
-            <a href="#">Cüzdan</a>
-            <a href="#">Kemer</a>
-            <a href="#">Gözlük</a>
-            <a href="#">Çanta</a>
-          </div>
-        </div>
-      </div>
-      <div class="kategori-kutu-dropdown">
-        <div class="kategori-kutu">Hobi</div>
-        <div class="mega-menu">
-  
-          <div class="mega-column">
-            <h4><a href="#">Müzik</a></h4>
+      {% for category in categories %}
+        {% if not category.parent %}
+          <div class="kategori-kutu-dropdown">
+            <div class="kategori-kutu">
+              <a href="{% url 'shop_categories' category.id %}">{{ category.name }}</a>
+            </div>
             
+            {% if category.get_children %}
+            <div class="mega-menu">
+              {% for child in category.get_children %}
+                <div class="mega-column">
+                  <h4><a href="{% url 'shop_categories' child.id %}">{{ child.name }}</a></h4>
+                  
+                  {% if child.get_children %}
+                    {% for sub in child.get_children %}
+                    <a href="{% url 'shop_categories' sub.id %}">{{ sub.name }}</a>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+            {% endif %}
           </div>
-          <div class="mega-column">
-            <h4><a href="#">Sanat</a></h4>
-            
-          </div>
-          <div class="mega-column">
-            <h4>Kitap</h4>
-            <a href="#">Edebiyat</a>
-            <a href="#">Eğitim</a>
-            <a href="#">Çocuk</a>
-          </div>
-
-          <div class="mega-column">
-            <h4>Oyun</h4>
-            <a href="#">Konsol</a>
-            <a href="#">Masa Oyunu</a>
-          </div>
-        </div>
-      </div>
-      <div class="kategori-kutu-dropdown">
-        <div class="kategori-kutu">Ev & Bahçe</div>
-        <div class="mega-menu">
-   
-        <div class="mega-column">
-          <h4><a href="#">Bahçe Mobilyaları</a></h4>
-        </div>
-        <div class="mega-column">
-          <h4><a href="#">Dekorasyon</a></h4>
-        </div>
-        <div class="mega-column">
-          <h4><a href="#">Bahçe Malzemeleri</a></h4>
-        </div>
-            
-        </div>
-      </div>
-      <div class="kategori-kutu-dropdown">
-        <div class="kategori-kutu">Spor</div>
-        <div class="mega-menu">
-  
-          <div class="mega-column">
-            <h4><a href="#">Toplar</a></h4>
-          </div>
-          <div class="mega-column">
-            <h4><a href="#">Formalar</a></h4>
-          </div>
-          <div class="mega-column">
-            <h4><a href="#">Araç-Gereç</a></h4>
-          </div>
-        </div>
-      </div>
-      <div class="kategori-kutu-dropdown">
-        <div class="kategori-kutu">ofis&kırtasiye</div>
-        <div class="mega-menu">
-   
-          <div class="mega-column">
-            <a href="#">..</a>
-            <a href="#">..</a>
-            <a href="#">..</a>
-          </div>
-          </div>
-        </div>
-      </div>
+        {% endif %}
+      {% endfor %}
    </div>
    
    <div class="slider-container"><!-- kayan ürünler menüsü-->

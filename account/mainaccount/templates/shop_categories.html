@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {%load static%}
+{% load image_filters %}
 
 {% block link %}
   <link rel="stylesheet" href={% static 'css/shop_categ.css' %}>
@@ -24,19 +25,15 @@
         <div class="filter-box">
           <h5>Categories</h5>
           <ul class="filter-list">
-            <li>Accessories <span>(3)</span></li>
-            <li>Bedroom <span>(5)</span></li>
-            <li>Clothing <span>(6)</span></li>
-            <li>Furniture <span>(8)</span></li>
-            <li>Handbag <span>(4)</span></li>
-            <li>Laptops & Desktops <span>(4)</span></li>
-            <li>Livingroom <span>(5)</span></li>
-            <li>Men <span>(10)</span></li>
-            <li>Mobiles & Tablets <span>(7)</span></li>
-            <li>Shoes <span>(7)</span></li>
-            <li>Sport & Outdoors <span>(4)</span></li>
-            <li>Toy, Kids & Baby <span>(8)</span></li>
-            <li>Women <span>(2)</span></li>
+            {% for subcategory in subcategories %}
+                <li>
+                  <a href="{% url 'shop_categories' subcategory.id %}">
+                    {{ subcategory.name }} 
+                  </a>
+                </li>
+              {% empty %}
+                <li>Alt kategori yok</li>
+              {% endfor %}
           </ul>
         </div>
         
@@ -61,84 +58,44 @@
       </div>
 
       <div class="products"><!--ürünler kısmı-->
-        <div class="product-wrap"><!--her ürün küçük paketlere bölündü ve resimle bilgilerin görüntüsü ayarlandı-->
-          <div class="product-img">
-            <img src={% static 'pictures/imageplaceholder.png' %} alt="Ürün 1" class="main-img">
-            <img src={% static 'pictures/imageplaceholder2.png' %} alt="Ürün 1 Hover" class="hover-img">
-          </div>
-          <div class="product-info">
-            <span class="rating">⭐⭐⭐☆☆</span>
-            <h6 class="urun-baslik">retro saat</h6>
-            <div class="urun-fiyat">$100.00</div>
-            <button class="urun-button">sepete ekle</button>
-          </div>
-          
-        </div>
-        <div class="product-wrap">
-          <div class="product-img">
-            <img src={% static 'pictures/imageplaceholder.png' %} alt="Ürün 1" class="main-img">
-            <img src={% static 'pictures/imageplaceholder2.png' %} alt="Ürün 1 Hover" class="hover-img">
-          </div>
-          <div class="product-info">
-            <span class="rating">⭐⭐⭐☆☆</span>
-            <h6 class="urun-baslik">retro saat</h6>
-            <div class="urun-fiyat">$100.00</div>
-            <button class="urun-button">sepete ekle</button>
-          </div>
-          
-        </div>
-        <div class="product-wrap">
-          <div class="product-img">
-            <img src={% static 'pictures/imageplaceholder.png' %} alt="Ürün 1" class="main-img">
-            <img src={% static 'pictures/imageplaceholder2.png' %} alt="Ürün 1 Hover" class="hover-img">
-          </div>
-          <div class="product-info">
-            <span class="rating">⭐⭐⭐☆☆</span>
-            <h6 class="urun-baslik">retro saat</h6>
-            <div class="urun-fiyat">$100.00</div>
-            <button class="urun-button">sepete ekle</button>
-          </div>
-          
-        </div>
-        <div class="product-wrap">
-          <div class="product-img">
-            <img src={% static 'pictures/imageplaceholder.png' %} alt="Ürün 1" class="main-img">
-            <img src={% static 'pictures/imageplaceholder2.png' %} alt="Ürün 1 Hover" class="hover-img">
-          </div>
-          <div class="product-info">
-            <span class="rating">⭐⭐⭐☆☆</span>
-            <h6 class="urun-baslik">retro saat</h6>
-            <div class="urun-fiyat">$100.00</div>
-            <button class="urun-button">sepete ekle</button>
-          </div>
-          
-        </div>
-        <div class="product-wrap">
-          <div class="product-img">
-            <img src={% static 'pictures/imageplaceholder.png' %} alt="Ürün 1" class="main-img">
-            <img src={% static 'pictures/imageplaceholder2.png' %} alt="Ürün 1 Hover" class="hover-img">
-          </div>
-          <div class="product-info">
-            <span class="rating">⭐⭐⭐☆☆</span>
-            <h6 class="urun-baslik">retro saat</h6>
-            <div class="urun-fiyat">$100.00</div>
-            <button class="urun-button">sepete ekle</button>
-          </div>
-          
-        </div>
-        
-
-       
- 
-          <!-- Diğer ürünler aynı şekilde buraya -->
-           
+        {% for product in products %}
+            <div class="product-wrap">
+              <a href="{% url 'product_info' %}"> 
+              
+              <div class="product-img">
+                {% with main_image=product.images.all|get_main_image hover_image=product.images.all|get_hover_image %}
+                  {% if main_image %}
+                    <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="main-img">
+                  {% else %}
+                    <img src="{% static 'pictures/imageplaceholder.png' %}" alt="{{ product.name }}" class="main-img">
+                  {% endif %}
+              
+                  {% if hover_image %}
+                    <img src="{{ hover_image.image.url }}" alt="{{ product.name }} Hover" class="hover-img">
+                  {% else %}
+                    <img src="{% static 'pictures/imageplaceholder2.png' %}" alt="{{ product.name }} Hover" class="hover-img">
+                  {% endif %}
+                {% endwith %}
+              </div>
+              
+              <div class="product-info">
+                <span class="rating">⭐⭐⭐☆☆</span>
+                <h6 class="urun-baslik">{{ product.name }}</h6>
+                <div class="urun-fiyat">${{ product.price }}</div>
+                <button class="urun-button">sepete ekle</button>
+              </div>
+            </a>
+            </div>
+          {% endfor %}
+          {% empty %}
+            <div class="no-products">No products available in this category.</div>
+          {% endfor %}
       </div>
-      
-        
+
     </div>
   
     {% endblock  %}  
     
     {% block script %}
-      <script src={% static 'main.js' %}></script>
+      
     {% endblock  %}

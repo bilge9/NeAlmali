@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product, Category
 
 def index(request):
@@ -70,11 +70,41 @@ def logout_view(request):
 
 
 def shopping(request):
-    return render(request, 'shopping.html')
+    categories = Category.objects.all()  # Tüm kategorileri al
 
-def shop_categories(request):
-    return render(request, 'shop_categories.html')
-# Create your views here.
+    return render(request, 'shopping.html', {
+        'categories': categories
+    })
+
+def shop_categories(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    
+    # Seçilen kategori ve alt kategorilerini al
+    categories = category.get_descendants(include_self=True)
+    
+    # Bu kategorilere ait ürünleri getir
+    products = Product.objects.filter(category__in=categories).prefetch_related('images').distinct()
+
+    # Sol menüde göstermek için yalnızca birinci seviyedeki alt kategorileri al
+    subcategories = category.get_children()
+
+    # Eğer kategori birinci seviye değilse, üst kategoriyi al
+    if category.parent:
+        parent_category = category.parent
+    else:
+        parent_category = None
+
+    # Tüm kategorileri al (Üst kategoriler de dahil)
+    all_categories = Category.objects.all()
+
+    return render(request, 'shop_categories.html', {
+        'category': category,
+        'products': products,
+        'subcategories': subcategories,  # Sol menü için
+        'categories': categories,  # Üst kategori için
+        'parent_category': parent_category,  # Üst kategori için
+        'all_categories': all_categories,  # Tüm kategoriler için
+    })
 
 def product_list(request):
     color_filter = request.GET.get('color')

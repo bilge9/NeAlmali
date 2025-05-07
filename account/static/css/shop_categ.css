@@ -30,7 +30,7 @@
   /* Sol Filtre Paneli */
 
 .filter-sidebar {
-     border-radius: 10px;
+    border-radius: 10px;
     width: 250px;
     padding: 20px;
     background-color: #fff;
@@ -63,6 +63,15 @@
     justify-content: space-between;
     color: #666;
     cursor: pointer;
+}
+
+.filter-list a {
+    text-decoration: none;
+    color: #000000c2;
+}
+
+.filter-list a:hover {
+    text-decoration: underline;
 }
   
 .filter-list li:hover {

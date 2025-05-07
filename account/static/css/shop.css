@@ -96,6 +96,11 @@ body {
 .kategori-kutu:hover {
     background-color: #fcbdb4;
 }
+
+.kategori-kutu a{
+    text-decoration: none;
+    color: black
+}
     
 .mega-menu {
     display: none;
