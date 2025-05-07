@@ -122,10 +122,6 @@ window.addEventListener('scroll', () => {
   }
 });
 
-<button onclick="document.getElementById('dahaFazlaBaslik').style.display='block'" class="btn btn-secondary mt-3">
-  Daha Fazla Başlık
-</button>
-
 function togglePassword(id) {
   const input = document.getElementById(id);
   if (input.type === "password") {
