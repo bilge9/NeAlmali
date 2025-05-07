@@ -5,11 +5,28 @@
   <link rel="stylesheet" href={% static 'css/forum.css' %}>
 {% endblock %}
 
+{% block script %}
+  <script src="{% static 'js/main.js' %}"></script>
+{% endblock %}
+
 {% block title %}NeAlmalı - Forum{% endblock %}
   
 {% block message %}
   {% include 'message_box.html' %}
 {% endblock message %}
+
+{%block search-bar%}
+<!-- Arama çubuğu -->
+<div class="search-bar">
+  <div class="input-group">
+  <input type="text" class="form-control" placeholder="" aria-label="Search">
+  <button class="input-group-text">
+      <i class="bi bi-search"></i>
+  </button>
+
+  </div>
+</div>
+{%endblock search-bar%}
 
 {% block content %}
   <div id="banner" class="banner-container"><!--banner resmi-->
@@ -21,12 +38,14 @@
   <div class="forum-container ">
     <div class="row">
       
+
+      
       <!-- Sol taraf: Ana başlık listesi (geniş) -->
       <div class="col-md-8 border-end-md forum-ana-kisim">
         <h2 class="mb-4">İlginizi çekebilecek başlıklar</h2>
         <div class="list-group">
           <a href="#" class="list-group-item list-group-item-action">
-            <div class="d-flex w-100 justify-content-between">
+            <!--<div class="d-flex w-100 justify-content-between">
               <h5 class="mb-1">uygun ayakkabı yardımm edin!</h5>
               <small class="text-muted">1 hafta önce</small>
             </div>
@@ -60,11 +79,11 @@
             <small class="text-body-secondary">by Admin</small>
             <span class="badge rounded-pill bg-primary position-absolute top-0 end-0 m-2">Python</span>
           </a>
- 
+          -->
           
           <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
             <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">Pythonda Veri Tabanı Bağlantısı</h5>
+              <h5 class="mb-1">Yazlık Elbise Önerisi</h5>
           
               <!-- Kategori ve Tarih sağ üstte -->
               <div class="d-flex align-items-center gap-2">
@@ -73,7 +92,7 @@
               </div>
             </div>
           
-            <p class="mb-1">Python ile MySQL bağlantısı nasıl kurulur? En iyi yöntemler nelerdir?</p>
+            <p class="mb-1">Çiçekli tiril tiril elbise arıyorum öneriler??</p>
           
             <div class="d-flex justify-content-between align-items-center">
               <small class="text-body-secondary">by DeveloperX</small>
@@ -83,10 +102,88 @@
                 <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
                 <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
                 <span><i class="bi bi-eye"></i> 156</span>
-                <span class="badge rounded-pill bg-primary">Python</span>
+                <span class="badge rounded-pill bg-primary">Kombin</span>
               </div>
             </div>
           </a>
+          <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">Yazlık Elbise Önerisi</h5>
+          
+              <!-- Kategori ve Tarih sağ üstte -->
+              <div class="d-flex align-items-center gap-2">
+                
+                <small class="text-muted">1 hafta önce</small>
+              </div>
+            </div>
+          
+            <p class="mb-1">Çiçekli tiril tiril elbise arıyorum öneriler??</p>
+          
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-body-secondary">by DeveloperX</small>
+          
+              <!-- Beğeni ve Görüntülenme sağ altta -->
+              <div class="d-flex align-items-center gap-3 text-muted">
+                <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
+                <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
+                <span><i class="bi bi-eye"></i> 156</span>
+                <span class="badge rounded-pill bg-primary">Kombin</span>
+              </div>
+            </div>
+          </a>
+          <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">Yazlık Elbise Önerisi</h5>
+          
+              <!-- Kategori ve Tarih sağ üstte -->
+              <div class="d-flex align-items-center gap-2">
+                
+                <small class="text-muted">1 hafta önce</small>
+              </div>
+            </div>
+          
+            <p class="mb-1">Çiçekli tiril tiril elbise arıyorum öneriler??</p>
+          
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-body-secondary">by DeveloperX</small>
+          
+              <!-- Beğeni ve Görüntülenme sağ altta -->
+              <div class="d-flex align-items-center gap-3 text-muted">
+                <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
+                <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
+                <span><i class="bi bi-eye"></i> 156</span>
+                <span class="badge rounded-pill {% if kategori == 'kombin' %}bg-success{% else %}bg-secondary{% endif %}">Kombin</span>
+
+              </div>
+            </div>
+          </a>
+          <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">Yazlık Elbise Önerisi</h5>
+          
+              <!-- Kategori ve Tarih sağ üstte -->
+              <div class="d-flex align-items-center gap-2">
+                
+                <small class="text-muted">1 hafta önce</small>
+              </div>
+            </div>
+          
+            <p class="mb-1">Çiçekli tiril tiril elbise arıyorum öneriler??</p>
+          
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-body-secondary">by DeveloperX</small>
+          
+              <!-- Beğeni ve Görüntülenme sağ altta -->
+              <div class="d-flex align-items-center gap-3 text-muted">
+                <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
+                <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
+                <span><i class="bi bi-eye"></i> 156</span>
+                <span class="badge rounded-pill bg-primary">Kombin</span>
+              </div>
+            </div>
+          </a>
+
+          
 
           <div id="dahaFazlaBaslik" style="display: none;">
             <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
@@ -168,12 +265,42 @@
             <a href="#" class="list-group-item list-group-item-action">HTML5 Yeni Özellikler</a>
           </div>
         </div>
-  
       </div>
-  
     </div>
   </div>
-
+  <!-- forum sayfasında, başlık açma -->
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <h3 class="mb-3">Yeni Başlık Oluştur</h3>
+        <div class="card mb-4 create-topic-form">
+          <div class="card-header"></div>
+          <div class="card-body">
+            <form method="POST" action="baslik_ekle">
+               <div class="mb-3">
+                 <label for="title" class="form-label">Başlık</label>
+                 <input type="text" class="form-control" id="title" name="title" required>
+               </div>
+               <div class="mb-3">
+                 <label for="content" class="form-label">Açıklama</label>
+                 <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+               </div>
+               <div class="mb-3">
+                 <label for="kategori" class="form-label">Kategori</label>
+                 <select class="form-select" name="kategori" id="kategori">
+                   <option value="kombin">Kombin</option>
+                   <option value="teknoloji">Teknoloji</option>
+                   <option value="spor">Spor</option>
+                   <!-- diğer kategoriler -->
+                 </select>
+               </div>
+               <button type="submit" class="btn custom-btn">Başlık Oluştur</button>
+             </form>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
 
   <div class="category-grid"><!--burası alt kategoriler kutu haklinde fazla koymuştum onları sileriz-->
     <div class="category-card">
@@ -210,8 +337,4 @@
     <!-- Daha fazla kategori ekleyebilirsin -->
   </div>
   
-  {% endblock %}
-
-  {% block script %}
-    <script src={% static 'main.js'%}></script>
   {% endblock %}

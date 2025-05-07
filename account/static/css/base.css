@@ -81,7 +81,7 @@ border-right: none; /* Butonla birleşme hatası olmaması için */
 border-top-right-radius: 30px;
 border-bottom-right-radius: 30px;
 border-left: none;
-background-color: none;
+background-color: transparent;
 border: 1.75px solid #1b0122;
 border-left: none;
 }
