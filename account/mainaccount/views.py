@@ -3,7 +3,9 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Category
+from .models import Product, Category, ForumCategory, Thread, Reply, ThreadVote
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 
 def index(request):
     return render(request, 'index.html')
@@ -141,10 +143,95 @@ def product_list(request):
     return render(request, 'shopping.html', context)
 
 def forum(request):
-    return render(request, 'forum.html')
+    threads = Thread.objects.all()
+    return render(request, 'forum.html', {'threads': threads})
 
-def forum_caption(request):
-    return render(request, 'forum_caption.html')
 
 def product_info(request):
     return render(request, 'product_info.html')
+def thread_detail(request, thread_id):
+    thread = get_object_or_404(Thread, id=thread_id)
+     # Görüntülenme sayısını artır
+    thread.views += 1
+    thread.save(update_fields=['views'])
+    replies = Reply.objects.filter(thread=thread).order_by('created_at')
+   
+      # Kategoriyi alıyoruz
+    category_id = request.GET.get('category_id', None)  # URL'den category_id parametresini alıyoruz
+
+
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden("Yanıt yazmak için giriş yapmalısınız.")
+
+        content = request.POST.get('content')
+        if content:
+            Reply.objects.create(
+                thread=thread,
+                user=request.user,
+                content=content
+            )
+            return redirect('thread_detail', thread_id=thread_id)
+
+    return render(request, 'thread_detail.html', {
+        'thread': thread,
+        'replies': replies,
+        'category_id': category_id  
+    })
+    
+def reply_create(request, thread_id):
+    thread = get_object_or_404(Thread, id=thread_id)
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content and request.user.is_authenticated:
+            Reply.objects.create(
+                thread=thread,
+                user=request.user,
+                content=content
+            )
+    return redirect('thread_detail', thread_id=thread.id)
+
+def vote_thread(request, thread_id, vote_type):
+    thread = get_object_or_404(Thread, id=thread_id)
+    
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden("Beğenme işlemi için giriş yapmalısınız.")    
+    
+    user = request.user
+    if vote_type not in ['like', 'dislike']:
+        return redirect('thread_detail', thread_id=thread.id)
+
+    # Var olan oy kontrolü
+    existing_vote = ThreadVote.objects.filter(user=user, thread=thread).first()
+
+    if existing_vote:
+        if existing_vote.value == vote_type:
+            # Aynı oyu tekrar verdiyse: oyunu geri çekmek istiyor demektir
+            existing_vote.delete()
+        else:
+            # Oy türünü değiştiriyor
+            existing_vote.value = vote_type
+            existing_vote.save()
+    else:
+        # İlk kez oy veriyor
+        ThreadVote.objects.create(user=user, thread=thread, value=vote_type)
+
+    return redirect('thread_detail', thread_id=thread.id)
+
+def category_detail(request, category_id):
+    category = get_object_or_404(ForumCategory, id=category_id)
+    threads = category.threads.all()  # Bu kısımda `threads` ilişkisini kullanabilirsiniz
+    return render(request, 'category_detail.html', {'category': category, 'threads': threads})
+
+def category_list(request):
+    categories = ForumCategory.objects.all()  # Tüm kategorileri al
+    return render(request, 'category_list.html', {'categories': categories})
+
+def category_threads(request, category_id):
+    category = get_object_or_404(ForumCategory, id=category_id)
+    threads = Thread.objects.filter(categories=category).order_by('-created_at')
+    return render(request, 'category_threads.html', {
+        'category': category,
+        'threads': threads
+    })

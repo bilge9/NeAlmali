@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <h1>Kategoriler</h1>
+
+  <ul>
+    {% for category in categories %}
+        <li>
+            <a href="{% url 'category_detail' category.id %}">{{ category.name }}</a>
+            <p>{{ category.description }}</p>
+
+            <!-- Bu kategoriye ait başlıkları listeleyelim -->
+            <h3>Bu Kategorideki Başlıklar:</h3>
+            <ul>
+                {% for thread in category.threads.all %}
+                    <li>
+                        <a href="{% url 'thread_detail' thread.id %}">{{ thread.title }}</a>
+                        <p>Beğeniler: {{ thread.actual_like_count }} | Beğenmeyenler: {{ thread.actual_dislike_count }}</p>
+                    </li>
+                {% empty %}
+                    <li>Bu kategoride başlık bulunmamaktadır.</li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+</ul>
+
+  
+
+</body>
+</html>

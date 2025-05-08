@@ -1,15 +1,16 @@
 from django.contrib import admin
 from .models import (
-    Category,
     Product,
+    Category,
     ProductImage,
     Attribute,
     CategoryAttribute,
-    ProductAttributeValue
+    ProductAttributeValue,
+    Thread,
+    ForumCategory,
+    Reply
 )
 from mptt.admin import MPTTModelAdmin
-
-# Register your models here.
 
 # === ProductAttributeValue Inline ===
 class ProductAttributeValueInline(admin.TabularInline):
@@ -24,18 +25,20 @@ class ProductImageInline(admin.TabularInline):
 # === Product Admin ===
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'created_at')
+    list_display = ('name', 'price', 'category')
+    search_fields = ('name', 'category__name')
     list_filter = ('category',)
-    search_fields = ('name',)
+    ordering = ('-price',)
     inlines = [ProductAttributeValueInline, ProductImageInline]
 
-# === Category Admin ===
+# === Category Admin (MPTT ile) ===
 @admin.register(Category)
 class CategoryAdmin(MPTTModelAdmin):
     list_display = ('name', 'parent')
     search_fields = ('name',)
+    ordering = ('name',)
 
-# === ProductImage Admin (tek başına da görüntülenebilsin) ===
+# === ProductImage Admin ===
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
     list_display = ('product', 'is_main')
@@ -51,8 +54,26 @@ class AttributeAdmin(admin.ModelAdmin):
 class CategoryAttributeAdmin(admin.ModelAdmin):
     list_display = ('category', 'attribute')
 
-# === ProductAttributeValue Admin (isteğe bağlı olarak) ===
+# === ProductAttributeValue Admin ===
 @admin.register(ProductAttributeValue)
 class ProductAttributeValueAdmin(admin.ModelAdmin):
     list_display = ('product', 'attribute', 'value')
     list_filter = ('attribute',)
+
+# === Thread Admin ===
+@admin.register(Thread)
+class ThreadAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user', 'created_at', 'like_count', 'dislike_count')
+    filter_horizontal = ('categories',)
+
+# === ForumCategory Admin ===
+@admin.register(ForumCategory)
+class ForumCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+# === Reply Admin ===
+@admin.register(Reply)
+class ReplyAdmin(admin.ModelAdmin):
+    list_display = ('user', 'thread', 'content', 'created_at')
+    search_fields = ('user__username', 'content')
+    list_filter = ('created_at',)
