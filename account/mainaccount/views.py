@@ -142,10 +142,32 @@ def product_list(request):
     }
     return render(request, 'shopping.html', context)
 
-def forum(request):
-    threads = Thread.objects.all()
-    return render(request, 'forum.html', {'threads': threads})
+def forum_page(request):
+    categories = ForumCategory.objects.all()
+    threads = Thread.objects.all().order_by('-id')
 
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return redirect('/giris-yap/?next=' + request.path)
+
+        title = request.POST.get("title")
+        content = request.POST.get("content")
+        category_ids = request.POST.getlist("categories")
+
+        if title and content and category_ids:
+            thread = Thread.objects.create(
+                title=title,
+                content=content,
+                user=request.user
+            )
+            thread.categories.set(category_ids)
+            thread.save()
+            return redirect("forum_page")
+
+    return render(request, "forum.html", {
+        "categories": categories,
+        "threads": threads,
+    })
 
 def product_info(request):
     return render(request, 'product_info.html')

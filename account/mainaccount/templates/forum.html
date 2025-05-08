@@ -174,7 +174,7 @@
     </div>
   </div>
 
-  <!-- forum sayfasında, başlık açma -->
+    <!-- forum sayfasında, başlık açma -->
   <div class="container my-5">
     <div class="row justify-content-center">
       <div class="col-md-8">
@@ -182,31 +182,50 @@
         <div class="card mb-4 create-topic-form">
           <div class="card-header"></div>
           <div class="card-body">
-            <form method="POST" action="baslik_ekle">
-               <div class="mb-3">
-                 <label for="title" class="form-label">Başlık</label>
-                 <input type="text" class="form-control" id="title" name="title" required>
-               </div>
-               <div class="mb-3">
-                 <label for="content" class="form-label">Açıklama</label>
-                 <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
-               </div>
-               <div class="mb-3">
-                 <label for="kategori" class="form-label">Kategori</label>
-                 <select class="form-select" name="kategori" id="kategori">
-                   <option value="kombin">Kombin</option>
-                   <option value="teknoloji">Teknoloji</option>
-                   <option value="spor">Spor</option>
-                   <!-- diğer kategoriler -->
-                 </select>
-               </div>
-               <button type="submit" class="btn custom-btn">Başlık Oluştur</button>
-             </form>
-           </div>
-         </div>
-       </div>
-     </div>
-   </div>
+            {% if user.is_authenticated %}
+              <form method="POST" action="{% url 'forum_page' %}">
+                {% csrf_token %}
+              
+               <!-- Başlık -->
+                <div class="mb-3">
+                  <label for="title" class="form-label">Başlık</label>
+                  <input type="text" class="form-control" name="title" id="title" placeholder="Başlık" required>
+                </div>
+
+              <!-- İçerik -->
+                <div class="mb-3">
+                  <label for="content" class="form-label">İçerik</label>
+                  <textarea class="form-control" name="content" id="content" placeholder="İçerik" rows="5" required></textarea>
+                </div>
+
+              <!-- Kategoriler -->
+                <div class="mb-3">
+                  <label class="form-label">Kategoriler (çoklu seçim):</label>
+                  <div class="form-check">
+                    {% for category in categories %}
+                      <input class="form-check-input" type="checkbox" name="categories" value="{{ category.id }}" id="category_{{ category.id }}">
+                      <label class="form-check-label" for="category_{{ category.id }}">
+                        {{ category.name }}
+                      </label>
+                      <br>
+                    {% endfor %}
+                  </div>
+                </div>
+
+              <!-- Gönder Butonu -->
+                <button type="submit" class="btn custom-btn">Yeni Başlık Oluştur</button>
+              </form>
+            {% else %}
+              <div class="alert alert-warning text-center">
+                Lütfen <a href="{% url 'login_view' %}">giriş yapın</a>. Yeni başlık oluşturmak için hesabınızla giriş yapmanız gerekmektedir.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <div class="category-grid"><!--burası alt kategoriler kutu haklinde fazla koymuştum onları sileriz-->
     <div class="category-card">
