@@ -38,152 +38,57 @@
   <div class="forum-container ">
     <div class="row">
       
-
-      
       <!-- Sol taraf: Ana başlık listesi (geniş) -->
       <div class="col-md-8 border-end-md forum-ana-kisim">
         <h2 class="mb-4">İlginizi çekebilecek başlıklar</h2>
         <div class="list-group">
-          <a href="#" class="list-group-item list-group-item-action">
-            <!--<div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">uygun ayakkabı yardımm edin!</h5>
-              <small class="text-muted">1 hafta önce</small>
-            </div>
-          
-            <p class="mb-1">momomooom?</p>
-          
-            <div class="d-flex justify-content-between align-items-center flex-wrap mt-2">
-              <small class="text-body-secondary">by DeveloperX</small>
-          
-              <div class="d-flex align-items-center flex-wrap gap-2">
-                <button class="btn btn-sm btn-light d-flex align-items-center gap-1" data-post-id="123" data-action="like">
-                  <i class="bi bi-hand-thumbs-up"></i> <span>12</span>
-                </button>
-                <button class="btn btn-sm btn-light d-flex align-items-center gap-1" data-post-id="123" data-action="dislike">
-                  <i class="bi bi-hand-thumbs-down"></i> <span>3</span>
-                </button>
-                <div class="d-flex align-items-center gap-1 text-muted">
-                  <i class="bi bi-eye"></i> <span>156</span>
-                </div>
-                <a href="/kategori/kombin" class="badge bg-primary text-decoration-none px-2 py-1">kombin</a>
-              </div>
-            </div>
-          </a>
-        
-          <a href={% url 'forum_caption' %} class="list-group-item list-group-item-action">
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">Django'da Slug Kullanımı</h5>
-              <small>2 gün önce</small>
-            </div>
-            <p class="mb-1">Django projelerinde slug nasıl kullanılır? Avantajları nelerdir?</p>
-            <small class="text-body-secondary">by Admin</small>
-            <span class="badge rounded-pill bg-primary position-absolute top-0 end-0 m-2">Python</span>
-          </a>
-          -->
-          
-          <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">Yazlık Elbise Önerisi</h5>
-          
-              <!-- Kategori ve Tarih sağ üstte -->
-              <div class="d-flex align-items-center gap-2">
-                
-                <small class="text-muted">1 hafta önce</small>
-              </div>
-            </div>
-          
-            <p class="mb-1">Çiçekli tiril tiril elbise arıyorum öneriler??</p>
-          
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-body-secondary">by DeveloperX</small>
-          
-              <!-- Beğeni ve Görüntülenme sağ altta -->
-              <div class="d-flex align-items-center gap-3 text-muted">
-                <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
-                <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
-                <span><i class="bi bi-eye"></i> 156</span>
-                <span class="badge rounded-pill bg-primary">Kombin</span>
-              </div>
-            </div>
-          </a>
-          <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">Yazlık Elbise Önerisi</h5>
-          
-              <!-- Kategori ve Tarih sağ üstte -->
-              <div class="d-flex align-items-center gap-2">
-                
-                <small class="text-muted">1 hafta önce</small>
-              </div>
-            </div>
-          
-            <p class="mb-1">Çiçekli tiril tiril elbise arıyorum öneriler??</p>
-          
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-body-secondary">by DeveloperX</small>
-          
-              <!-- Beğeni ve Görüntülenme sağ altta -->
-              <div class="d-flex align-items-center gap-3 text-muted">
-                <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
-                <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
-                <span><i class="bi bi-eye"></i> 156</span>
-                <span class="badge rounded-pill bg-primary">Kombin</span>
-              </div>
-            </div>
-          </a>
-          <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">Yazlık Elbise Önerisi</h5>
-          
-              <!-- Kategori ve Tarih sağ üstte -->
-              <div class="d-flex align-items-center gap-2">
-                
-                <small class="text-muted">1 hafta önce</small>
-              </div>
-            </div>
-          
-            <p class="mb-1">Çiçekli tiril tiril elbise arıyorum öneriler??</p>
-          
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-body-secondary">by DeveloperX</small>
-          
-              <!-- Beğeni ve Görüntülenme sağ altta -->
-              <div class="d-flex align-items-center gap-3 text-muted">
-                <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
-                <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
-                <span><i class="bi bi-eye"></i> 156</span>
-                <span class="badge rounded-pill {% if kategori == 'kombin' %}bg-success{% else %}bg-secondary{% endif %}">Kombin</span>
 
-              </div>
-            </div>
-          </a>
-          <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">Yazlık Elbise Önerisi</h5>
-          
-              <!-- Kategori ve Tarih sağ üstte -->
-              <div class="d-flex align-items-center gap-2">
-                
-                <small class="text-muted">1 hafta önce</small>
-              </div>
-            </div>
-          
-            <p class="mb-1">Çiçekli tiril tiril elbise arıyorum öneriler??</p>
-          
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-body-secondary">by DeveloperX</small>
-          
-              <!-- Beğeni ve Görüntülenme sağ altta -->
-              <div class="d-flex align-items-center gap-3 text-muted">
-                <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
-                <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
-                <span><i class="bi bi-eye"></i> 156</span>
-                <span class="badge rounded-pill bg-primary">Kombin</span>
-              </div>
-            </div>
-          </a>
+          {% for thread in threads %}
+        <div class="list-group-item thread-box" data-url="{% url 'thread_detail' thread.id %}" style="cursor: pointer;">
+    
+    <!-- Başlık ve Tarih -->
+          <div class="d-flex w-100 justify-content-between flex-wrap">
+            <h5 class="mb-1 text-dark">{{ thread.title }}</h5>
+            <small class="text-muted">{{ thread.created_at|timesince }} önce</small>
+          </div>
 
-          
+    <!-- Açıklama -->
+          {% if thread.content %}
+            <p class="mb-2">
+          {{ thread.content }}
+            </p>
+          {% else %}
+            <p class="mb-2 text-muted fst-italic">Açıklama yok.</p>
+          {% endif %}
+
+    <!-- Kullanıcı + Beğeni/Görüntülenme + Kategoriler -->
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-2">
+
+      <!-- Kullanıcı -->
+          <small class="text-body-secondary">by {{ thread.user.username }}</small>
+
+          <div class="d-flex flex-column align-items-md-end gap-2">
+
+        <!-- Sayılar -->
+          <div class="d-flex align-items-center gap-3 text-muted flex-wrap">
+            <span><i class="bi bi-hand-thumbs-up"></i> {{ thread.like_count }}</span>
+            <span><i class="bi bi-hand-thumbs-down"></i> {{ thread.dislike_count }}</span>
+            <span><i class="bi bi-eye"></i> {{ thread.view_count }}</span>
+          </div>
+
+        <!-- Kategoriler -->
+          <div class="d-flex flex-wrap gap-1">
+            {% for category in thread.categories.all %}
+              <a href="{% url 'category_threads' category.id %}" class="badge rounded-pill text-bg-primary text-decoration-none" onclick="event.stopPropagation();">
+                {{ category.name }}
+              </a>
+            {% endfor %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endfor %}
 
           <div id="dahaFazlaBaslik" style="display: none;">
             <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
@@ -268,6 +173,7 @@
       </div>
     </div>
   </div>
+
   <!-- forum sayfasında, başlık açma -->
   <div class="container my-5">
     <div class="row justify-content-center">
@@ -336,5 +242,11 @@
   
     <!-- Daha fazla kategori ekleyebilirsin -->
   </div>
-  
+  <script>
+    document.querySelectorAll('.thread-box').forEach(function(box) {
+      box.addEventListener('click', function() {
+        window.location.href = this.dataset.url;
+      });
+    });
+  </script>
   {% endblock %}

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Forum Başlığı</title>
+  <title>{{ thread.title }}</title>
   <link rel="stylesheet" href={% static 'css/forum_caption.css'%} />
 </head>
 <body>
@@ -14,36 +14,65 @@
 <div class="main-container"><!--burdan aşağısı sayfanın genel tasarımı navbar ve kenarları falan doldurulmalı-->
   <!-- Sol: Cevaplar -->
   <div class="left-content">
-    <h1 class="thread-title">Forum Başlığı: Yazılımda En Sevdiğiniz Dil Nedir?</h1>
+    <h2 class="thread-title">{{ thread.title }}</h2>
+    <p>Oluşturan: {{ thread.user.username }} - {{ thread.created_at|date:"d M Y H:i" }}</p>
+    <p>{{ thread.content }}</p>
+    <!-- Beğenme ve Beğenmeme Butonlarını Herkes İçin Göster -->
+  <form method="POST" action="{% if user.is_authenticated %}{% url 'vote_thread' thread.id 'like' %}{% else %}{% url 'login_view' %}{% endif %}">
+    {% csrf_token %}
+    <button class="btn btn-primary">
+        <i class="fas fa-thumbs-up"></i> Like
+        {{ thread.actual_like_count }}
+    </button>
+  </form>
 
-    <div id="replyList" class="reply-list">
-      <!-- Cevap Kutusu -->
-      <div class="reply-box">
-        <div class="user-info">
+  <form method="POST" action="{% if user.is_authenticated %}{% url 'vote_thread' thread.id 'dislike' %}{% else %}{% url 'login_view' %}{% endif %}">
+    {% csrf_token %}
+    <button class="btn btn-danger">
+        <i class="fas fa-thumbs-down"></i> Dislike
+        {{ thread.actual_dislike_count }}
+    </button>
+  </form>
+    <p>👍 {{ thread.actual_like_count }} | 👎 {{ thread.actual_dislike_count }}</p>
+
+  
+  <button onclick="toggleReplyForm()">Cevapla</button>
+
+  <div id="replyList" class="reply-list">
+    {% for reply in replies %}
+      <div class="reply-box" style="margin-bottom: 10px; padding: 8px; border: 1px solid #ccc;">
+        <div class="user-info" style="display: flex; align-items: center; gap: 10px;">
           <img src="https://via.placeholder.com/50" alt="Avatar" />
-          <p class="username">kullanici123</p>
+          <p class="username" style="font-weight: bold;">{{ reply.user.username }}</p>
         </div>
-        <div class="reply-content">
-          <p>Python çok güçlü ve öğrenmesi kolay bir dil.</p>
-          <div class="reply-actions">
-            <button onclick="showReplyForm('kullanici123', this)">💬 Cevapla</button><!--burda reply atabiliyorz-->
-            <button>👍 4</button>
-            <button>👎 0</button>
+        <div class="reply-content" style="margin-top: 5px;">
+          <p>{{ reply.content }}</p>
+          <small>{{ reply.created_at|date:"d M Y H:i" }}</small>
+          <div class="reply-actions" style="margin-top: 5px;">
+            <button onclick="showReplyForm('{{ reply.user.username }}', this)">💬 Cevapla</button>
           </div>
         </div>
       </div>
-    </div>
+    {% empty %}
+      <p>Henüz yanıt yok.</p>
+    {% endfor %}
+  </div>
 
-    <!-- Alt Genel Cevap Formu -->
-    <div class="bottom-reply-form"><!--bura genel cevap vermek istersek onun için olan kısım-->
-        <form id="mainReplyForm" onsubmit="handleMainReply(event)">
-          <textarea id="mainReplyText" name="content" placeholder="Bu başlığa bir cevap yazın..." required></textarea>
-          <button type="submit">Gönder</button>
-        </form>
-        <div id="replyNotification" class="reply-notification" style="display: none;">
-          ✔️ Cevabınız gönderildi
-        </div>
-      </div>
+  {% if user.is_authenticated %}
+  <!-- Alt Genel Cevap Formu -->
+  <div class="bottom-reply-form">
+    <form method="POST" action="{% url 'reply_create' thread.id %}" id="mainReplyForm">
+      {% csrf_token %}
+      <textarea id="mainReplyText" name="content" placeholder="Bu başlığa bir cevap yazın..." required></textarea>
+      <button type="submit">Gönder</button>
+    </form>
+    <div id="replyNotification" class="reply-notification" style="display: none;">
+      ✔️ Cevabınız gönderildi
+    </div>
+  </div>
+{% else %}
+  <p>Yanıt yazmak için <a href="{% url 'login_view' %}">giriş yapın</a>.</p>
+{% endif %}
 
 
 
@@ -75,35 +104,22 @@
   <div class="new_topic">
     <button onclick="toggleTopicForm()">+ Yeni Konu</button>
   </div>
-  
-  <!-- Açılır Yeni Başlık Formu --><!--burayı tamamlamadım yeni başlık oluşturma formu butona basınca pencere açılıyor. bunu sağdan açılan menü gibi yapabiliriz belki-->
-  <div id="topicForm" class="dropdown-form" style="display: none;">
-    <div class="form-header">
-      <span>Yeni Başlık Oluştur</span>
-      <button onclick="toggleTopicForm()">✖</button>
-    </div>
-  
-    <input type="text" placeholder="Başlık" id="topicTitle" required />
-  
-    <textarea placeholder="Konu içeriği..." id="topicContent" required></textarea>
-  
-    <select id="topicCategories" multiple>
-      <option value="elektronik">Elektronik</option>
-      <option value="moda">Moda</option>
-      <option value="kitap">Kitap</option>
-      <option value="oyuncak">Oyuncak</option>
-      <!-- veritabanından dinamik olarak da çekilebilir -->
-    </select>
-  
-    <input type="file" id="topicFile" />
-  
-    <input type="text" placeholder="Ürün adıyla ara..." id="productSearch" />
-  
-    <button onclick="submitTopic()">Gönder</button>
-  </div>
-  
+ 
   
   <script>// java kodlarını henüz ayırmadım bir şey kesinleşmediği için
+  function toggleReplyForm() {
+            const form = document.getElementById("replyFormContainer");
+            form.style.display = (form.style.display === "none") ? "block" : "none";
+        }
+
+
+
+
+
+
+
+
+
 
   function toggleTopicForm() {
     const form = document.getElementById('topicForm');

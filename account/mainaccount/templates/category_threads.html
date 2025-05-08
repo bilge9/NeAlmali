@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <h2>{{ category.name }} Kategorisi</h2>
+<ul>
+    {% for thread in threads %}
+        <li><a href="{% url 'thread_detail' thread_id=thread.id %}?category_id={{ category.id }}">{{ thread.title }}</a></li>
+    {% empty %}
+    <li>Bu kategoride henüz başlık yok.</li>
+    {% endfor %}
+</ul>
+
+    
+
+</body>
+</html>
