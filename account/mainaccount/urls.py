@@ -8,9 +8,10 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout_view'),
     path( 'shopping/', views.shopping, name='shopping'),
     path('shop/category/<int:category_id>/', views.shop_categories, name='shop_categories'),
+    path('shop/category/product_info/<int:product_id>/', views.product_info, name='product_info'),
+    
     path('forum/', views.forum_page, name='forum_page'),
     path('thread/<int:thread_id>/', views.thread_detail, name='thread_detail'),
-    path('product_info/', views.product_info, name='product_info'),
     path('baslik/<int:thread_id>/yanitla/', views.reply_create, name='reply_create'),
     path('thread/<int:thread_id>/vote/<str:vote_type>/', views.vote_thread, name='vote_thread'),
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),

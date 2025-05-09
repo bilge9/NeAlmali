@@ -6,6 +6,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product, Category, ForumCategory, Thread, Reply, ThreadVote
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from .forms import ProductReviewForm
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.conf import settings
 
 def index(request):
     return render(request, 'index.html')
@@ -17,6 +20,7 @@ def register(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
+        next_page = request.POST.get('next') or 'index'  # fallback to index if boş
 
         print(f"Formdan gelen bilgiler: {full_name}, {email}, {password}")  # Debug
         if password != confirm_password:
@@ -42,7 +46,7 @@ def register(request):
 
         login(request, user)
         messages.success(request, 'Başarıyla kaydoldunuz.')
-        return redirect('index')
+        return redirect(next_page)
 
     return render(request, 'register.html')
 
@@ -51,13 +55,14 @@ def login_view(request):  # 'login' ismi Python'da gömülü olduğu için '_vie
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        next_page = request.POST.get('next') or 'index'  # fallback to index if boş
 
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
             login(request, user)
             messages.success(request, 'Başarıyla giriş yaptınız.')
-            return redirect('index')
+            return redirect(next_page)
         else:
             messages.error(request, 'Geçersiz e-posta veya şifre.')
             return redirect('login_view')
@@ -142,6 +147,41 @@ def product_list(request):
     }
     return render(request, 'shopping.html', context)
 
+def user_has_purchased(user, product):
+    # Sipariş sistemi varsa buraya kontrol eklenmeli
+    return True  # Şimdilik herkes yorum yapabilir gibi düşünelim
+
+def product_info(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    reviews = product.reviews.all()
+    form = None
+
+    # Yorum yapabilmek için kullanıcı doğrulaması ve ürünü satın almış olma kontrolü
+    if request.user.is_authenticated and user_has_purchased(request.user, product):
+        if request.method == 'POST':
+            form = ProductReviewForm(request.POST)
+            if form.is_valid():
+                # Yorum kaydetme işlemi
+                review = form.save(commit=False)
+                review.product = product
+                review.user = request.user
+                review.save()
+                
+                # Başarı mesajı ekleyelim
+                messages.success(request, 'Yorumunuz başarıyla gönderildi!')
+                
+                # Yorum yapıldıktan sonra sayfayı yenileyip formu sıfırlıyoruz
+                return redirect('product_info', product_id=product.id)
+        else:
+            form = ProductReviewForm()  # İlk sayfa yüklenirken boş formu gönder
+
+    return render(request, 'product_info.html', {
+        'product': product,
+        'form': form,
+        'reviews': reviews
+    })
+
+# Forum Kısmı
 def forum_page(request):
     categories = ForumCategory.objects.all()
     threads = Thread.objects.all().order_by('-id')
@@ -169,8 +209,6 @@ def forum_page(request):
         "threads": threads,
     })
 
-def product_info(request):
-    return render(request, 'product_info.html')
 def thread_detail(request, thread_id):
     thread = get_object_or_404(Thread, id=thread_id)
      # Görüntülenme sayısını artır

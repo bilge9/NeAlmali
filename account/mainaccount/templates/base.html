@@ -21,7 +21,9 @@
 </head>
 <body>
   
-    {% block message %}{% endblock message %}
+    {% block message %}
+      {% include "message_box.html" %}
+    {% endblock message %}
 
     
     

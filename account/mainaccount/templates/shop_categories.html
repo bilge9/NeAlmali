@@ -16,7 +16,7 @@
     </div>
   
     <div class="cat-cap"><!-- kategori sayfasının başlığı-->
-      <h2>.. kategorisi için ürünler</h2>
+      <h2>{{category.name}} kategorisi için ürünler</h2>
     </div>
   
     <div class="sayfa-wrapper"><!-- filtreleme kısmı ve ürünleri ayırdık sağ sol olacak şekilde-->
@@ -60,7 +60,7 @@
       <div class="products"><!--ürünler kısmı-->
         {% for product in products %}
             <div class="product-wrap">
-              <a href="{% url 'product_info' %}"> 
+              <a href="{% url 'product_info' product.id %}"> 
               
               <div class="product-img">
                 {% with main_image=product.images.all|get_main_image hover_image=product.images.all|get_hover_image %}
@@ -87,9 +87,11 @@
             </a>
             </div>
           {% endfor %}
-          {% empty %}
-            <div class="no-products">No products available in this category.</div>
-          {% endfor %}
+          {% if not products %}
+            <div class="no-products">
+              <p>Bu kategoride ürün bulunmamaktadır.</p>
+            </div>
+          {% endif %}
       </div>
 
     </div>
