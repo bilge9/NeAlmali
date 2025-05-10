@@ -17,4 +17,10 @@ urlpatterns = [
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),
     path('category/<int:category_id>/threads/', views.category_threads, name='category_threads'),
     path('kategoriler/', views.category_list, name='category_list'),
+    #sepet
+    path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('cart/', views.cart_detail, name='cart_detail'),
+    #favorilerim
+    path('favorites/add/<int:product_id>/', views.add_to_favorites, name='add_to_favorites'),
+    path('favorites/', views.favorite_list, name='favorite_list'),
 ]

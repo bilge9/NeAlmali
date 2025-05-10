@@ -101,6 +101,10 @@ outline: none;
 display: flex;
 }
 
+.icon-btn a{
+    color: black;
+}
+
 .icons-btn.dropdown {
 position: relative;
 }
