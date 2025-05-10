@@ -8,7 +8,10 @@ from .models import (
     ProductAttributeValue,
     Thread,
     ForumCategory,
-    Reply
+    Reply,
+    Cart,
+    CartItem,
+    Favorite
 )
 from mptt.admin import MPTTModelAdmin
 
@@ -76,4 +79,17 @@ class ForumCategoryAdmin(admin.ModelAdmin):
 class ReplyAdmin(admin.ModelAdmin):
     list_display = ('user', 'thread', 'content', 'created_at')
     search_fields = ('user__username', 'content')
+    list_filter = ('created_at',)
+
+#Sepet veritabanı
+
+admin.site.register(Cart)
+admin.site.register(CartItem)
+
+#favoriler
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'created_at')
+    search_fields = ('user__username', 'product__name')
     list_filter = ('created_at',)

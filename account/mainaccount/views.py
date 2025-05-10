@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Category, ForumCategory, Thread, Reply, ThreadVote
+from .models import Product, Category, ForumCategory, Thread, Reply, ThreadVote, Cart, CartItem, Favorite
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from .forms import ProductReviewForm
@@ -295,3 +295,51 @@ def category_threads(request, category_id):
         'category': category,
         'threads': threads
     })
+
+#Sepetim sayfası
+
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart, created = Cart.objects.get_or_create(user=request.user)
+
+    # sepette bu ürün zaten varsa, adedini artır
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+    if not created:
+        cart_item.quantity += 1
+        cart_item.save()
+
+    return redirect('cart_detail')  # sepet sayfasına yönlendir
+
+def cart_detail(request):
+    cart = Cart.objects.get(user=request.user)
+    items = cart.items.all()
+    total = sum(item.get_total_price() for item in items)
+    return render(request, 'cart_detail.html', {
+        'items': items,
+        'total': total
+    })
+
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart, created = Cart.objects.get_or_create(user=request.user)
+
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+    if not created:
+        cart_item.quantity += 1
+    cart_item.save()
+
+    return redirect('cart_detail')  # sepete yönlendiriyoruz
+
+#favoriler
+
+@login_required
+def add_to_favorites(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Favorite.objects.get_or_create(user=request.user, product=product)
+    return redirect('favorite_list')
+
+@login_required
+def favorite_list(request):
+    favorites = Favorite.objects.filter(user=request.user)
+    return render(request, 'favorite_list.html', {'favorites': favorites})

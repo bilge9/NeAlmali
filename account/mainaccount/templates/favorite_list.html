@@ -1,0 +1,6 @@
+<h2>Favori Ürünleriniz</h2>
+<ul>
+  {% for fav in favorites %}
+    <li>{{ fav.product.name }} - {{ fav.product.price }} TL</li>
+  {% endfor %}
+</ul>

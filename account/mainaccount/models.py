@@ -120,3 +120,35 @@ class Reply(models.Model):
         return f"Reply by {self.user.username} on {self.thread.title}"
 
 
+#Sepet veritabanı
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}'nin Sepeti"
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.quantity} adet"
+
+    def get_total_price(self):
+        return self.quantity * self.product.price
+    
+#favorilerim
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='favorited_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')  # Aynı ürün bir kez favorilere eklenebilsin
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name}"

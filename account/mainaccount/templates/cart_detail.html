@@ -1,0 +1,8 @@
+<h2>Sepetiniz</h2>
+<ul>
+  {% for item in cart.items.all %}
+    <li>{{ item.product.name }} - {{ item.quantity }} adet - Toplam: {{ item.get_total_price }} TL</li>
+  {% endfor %}
+</ul>
+
+<p><strong>Toplam:</strong> {{ total }} TL</p>
