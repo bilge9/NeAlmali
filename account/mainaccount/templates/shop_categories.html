@@ -10,6 +10,19 @@
 
 {% include 'message_box.html' %}
 
+{%block search-bar%}
+<!-- Arama çubuğu -->
+ <div class="search-bar">
+  <div class="input-group">
+  <input type="text" class="form-control" placeholder="" aria-label="Search">
+  <button class="input-group-text">
+      <i class="bi bi-search"></i>
+  </button>
+
+  </div>
+</div>
+{%endblock search-bar%}
+
 {% block content %}
     <div class="shop-hero">
         <img src="/pictures/shopbanner.png">
@@ -77,14 +90,14 @@
                   {% endif %}
                 {% endwith %}
               </div>
-              
+              </a>
               <div class="product-info">
                 <span class="rating">⭐⭐⭐☆☆</span>
                 <h6 class="urun-baslik">{{ product.name }}</h6>
                 <div class="urun-fiyat">${{ product.price }}</div>
-                <button class="urun-button">sepete ekle</button>
+                <button class="urun-button"><a href="{% url 'add_to_cart' product.id%}">Sepete Ekle</a></button>
               </div>
-            </a>
+            
             </div>
           {% endfor %}
           {% if not products %}
