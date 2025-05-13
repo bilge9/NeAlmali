@@ -3,12 +3,14 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Category, ForumCategory, Thread, Reply, ThreadVote, Cart, CartItem, Favorite
+from .models import Product, ProductAttributeValue, Category, ForumCategory, Thread, Reply, ThreadVote, Cart, CartItem, Favorite
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from .forms import ProductReviewForm
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
+from django.db.models import Q
+from django.core.paginator import Paginator
 
 def index(request):
     return render(request, 'index.html')
@@ -85,33 +87,48 @@ def shopping(request):
 
 def shop_categories(request, category_id):
     category = get_object_or_404(Category, id=category_id)
-    
+
     # Seçilen kategori ve alt kategorilerini al
     categories = category.get_descendants(include_self=True)
-    
-    # Bu kategorilere ait ürünleri getir
-    products = Product.objects.filter(category__in=categories).prefetch_related('images').distinct()
 
-    # Sol menüde göstermek için yalnızca birinci seviyedeki alt kategorileri al
+    # Arama sorgusunu al
+    query = request.GET.get('q')
+
+    # Arama varsa filtrele
+    if query:
+        # İlk olarak Product modelindeki doğrudan alanlarda arama
+        base_filter = Q(name__icontains=query) | Q(description__icontains=query) | Q(brand__icontains=query) | Q(category__name__icontains=query)
+
+        # Ardından ilgili attribute_value tablosunda arama yapalım
+        product_ids_from_attributes = ProductAttributeValue.objects.filter(
+            value__icontains=query
+        ).values_list('product_id', flat=True)
+
+        # Tüm ürünleri birleştirelim (doğrudan eşleşen + attribute ile eşleşen)
+        products = Product.objects.filter(
+            Q(category__in=categories) & (base_filter | Q(id__in=product_ids_from_attributes))
+        ).prefetch_related('images', 'attribute_values__attribute').distinct()
+    else:
+        products = Product.objects.filter(
+            category__in=categories
+        ).prefetch_related('images', 'attribute_values__attribute').distinct()
+
     subcategories = category.get_children()
 
-    # Eğer kategori birinci seviye değilse, üst kategoriyi al
-    if category.parent:
-        parent_category = category.parent
-    else:
-        parent_category = None
+    parent_category = category.parent if category.parent else None
 
-    # Tüm kategorileri al (Üst kategoriler de dahil)
     all_categories = Category.objects.all()
 
     return render(request, 'shop_categories.html', {
         'category': category,
         'products': products,
-        'subcategories': subcategories,  # Sol menü için
-        'categories': categories,  # Üst kategori için
-        'parent_category': parent_category,  # Üst kategori için
-        'all_categories': all_categories,  # Tüm kategoriler için
+        'subcategories': subcategories,
+        'categories': categories,
+        'parent_category': parent_category,
+        'all_categories': all_categories,
+        'query': query,  # Arama kutusunda geri göstermek için
     })
+
 
 def product_list(request):
     color_filter = request.GET.get('color')
@@ -184,7 +201,21 @@ def product_info(request, product_id):
 # Forum Kısmı
 def forum_page(request):
     categories = ForumCategory.objects.all()
-    threads = Thread.objects.all().order_by('-id')
+    query = request.GET.get('q')
+    
+    if query:
+        thread_list = Thread.objects.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(categories__name__icontains=query) |
+            Q(replies__content__icontains=query)
+        ).distinct().order_by('-id')
+    else:
+        thread_list = Thread.objects.all().order_by('-id')
+    
+    paginator = Paginator(thread_list, 10)  # Sayfa başına 10 başlık
+    page_number = request.GET.get("page")
+    threads = paginator.get_page(page_number)
 
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -202,12 +233,23 @@ def forum_page(request):
             )
             thread.categories.set(category_ids)
             thread.save()
-            return redirect("forum_page")
 
     return render(request, "forum.html", {
         "categories": categories,
         "threads": threads,
+        "query": query,
     })
+
+def forum_autocomplete(request):
+    term = request.GET.get('term', '')
+    titles = []
+
+    if term:
+        threads = Thread.objects.filter(title__icontains=term).values('id', 'title')[:5]
+        results = list(threads)
+
+    return JsonResponse(results, safe=False)
+
 
 def thread_detail(request, thread_id):
     thread = get_object_or_404(Thread, id=thread_id)

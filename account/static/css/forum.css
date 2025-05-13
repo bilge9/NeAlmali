@@ -287,3 +287,44 @@ h5 {
   font-weight: bold;
   margin-bottom: 10px;
 }
+
+.search-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Öneri kutusu düzgün hizalanacak şekilde ayarlandı */
+#suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  background-color: white;
+  border: 1.5px solid #1b0122;
+  border-radius: 8px;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-top: 5px;
+  display: none;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  display: block;
+  padding: 10px 15px;
+  color: #1b0122;
+  text-decoration: none;
+  border-bottom: 1px solid #e0d3ec;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background-color: #e8d5f0;
+  color: #000;
+  border-radius: 6px;
+}

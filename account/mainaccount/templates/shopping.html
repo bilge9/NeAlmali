@@ -13,15 +13,16 @@
 
 {%block search-bar%}
 <!-- Arama çubuğu -->
- <div class="search-bar">
-  <div class="input-group">
-  <input type="text" class="form-control" placeholder="" aria-label="Search">
-  <button class="input-group-text">
-      <i class="bi bi-search"></i>
-  </button>
-
+ <form method="get" action="{% url 'shop_categories' category_id=1 %}">
+  <div class="search-bar">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Ürün ara..." value="{{ query }}">
+      <button class="input-group-text" type="submit">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
   </div>
-</div>
+</form>
 {%endblock search-bar%}
     
 {% block content %}
