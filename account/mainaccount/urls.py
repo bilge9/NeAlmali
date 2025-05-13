@@ -11,6 +11,7 @@ urlpatterns = [
     path('shop/category/product_info/<int:product_id>/', views.product_info, name='product_info'),
     
     path('forum/', views.forum_page, name='forum_page'),
+    path('forum-autocomplete/', views.forum_autocomplete, name='forum_autocomplete'),
     path('thread/<int:thread_id>/', views.thread_detail, name='thread_detail'),
     path('baslik/<int:thread_id>/yanitla/', views.reply_create, name='reply_create'),
     path('thread/<int:thread_id>/vote/<str:vote_type>/', views.vote_thread, name='vote_thread'),
@@ -23,4 +24,5 @@ urlpatterns = [
     #favorilerim
     path('favorites/add/<int:product_id>/', views.add_to_favorites, name='add_to_favorites'),
     path('favorites/', views.favorite_list, name='favorite_list'),
+    
 ]
