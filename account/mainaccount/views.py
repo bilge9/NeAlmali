@@ -11,6 +11,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
 from django.db.models import Q
 from django.core.paginator import Paginator
+import re
+from django.db.models import Q
 
 def index(request):
     return render(request, 'index.html')
@@ -217,6 +219,25 @@ def forum_page(request):
     page_number = request.GET.get("page")
     threads = paginator.get_page(page_number)
 
+    # Çoklu kategori filtresi
+    category_filter = request.GET.getlist("category")
+    sort_by = request.GET.get("sort")  # Yeni: sıralama parametresi
+
+    threads = Thread.objects.all()
+    if category_filter:
+        threads = threads.filter(categories__id__in=category_filter).distinct()
+
+    # Sıralama işlemi
+    if sort_by == "views":
+        threads = threads.order_by("-views")
+    elif sort_by == "likes":
+        threads = threads.order_by("-like_count")
+    elif sort_by == "dislikes":
+        threads = threads.order_by("-dislike_count")
+    else:
+        threads = threads.order_by("-id")  # Varsayılan: en yeni başlıklar
+    
+
     if request.method == "POST":
         if not request.user.is_authenticated:
             return redirect('/giris-yap/?next=' + request.path)
@@ -233,11 +254,21 @@ def forum_page(request):
             )
             thread.categories.set(category_ids)
             thread.save()
+             # İlgili başlıkları bul ve ata
+            related = find_related_threads(thread)
+            thread.related_threads.set(related)
+            for r in related:
+                r.related_threads.add(thread)
+
+            return redirect("forum_page")
+
 
     return render(request, "forum.html", {
         "categories": categories,
         "threads": threads,
         "query": query,
+        "selected_categories": list(map(int, category_filter)) if category_filter else [],
+        "sort_by": sort_by,  # Şablonda kullanılacak
     })
 
 def forum_autocomplete(request):
@@ -296,30 +327,61 @@ def reply_create(request, thread_id):
 
 def vote_thread(request, thread_id, vote_type):
     thread = get_object_or_404(Thread, id=thread_id)
-    
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden("Beğenme işlemi için giriş yapmalısınız.")    
-    
-    user = request.user
-    if vote_type not in ['like', 'dislike']:
-        return redirect('thread_detail', thread_id=thread.id)
 
-    # Var olan oy kontrolü
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Giriş yapmalısınız.'}, status=403)
+
+    user = request.user
+
+    if vote_type not in ['like', 'dislike']:
+        return JsonResponse({'error': 'Geçersiz oy türü.'}, status=400)
+
     existing_vote = ThreadVote.objects.filter(user=user, thread=thread).first()
 
     if existing_vote:
         if existing_vote.value == vote_type:
-            # Aynı oyu tekrar verdiyse: oyunu geri çekmek istiyor demektir
             existing_vote.delete()
         else:
-            # Oy türünü değiştiriyor
             existing_vote.value = vote_type
             existing_vote.save()
     else:
-        # İlk kez oy veriyor
         ThreadVote.objects.create(user=user, thread=thread, value=vote_type)
 
-    return redirect('thread_detail', thread_id=thread.id)
+    thread.update_vote_counts()
+
+    return JsonResponse({
+        'like_count': thread.like_count,
+        'dislike_count': thread.dislike_count
+    })
+
+def extract_keywords(text):#ilgili başlık bulma kısmındaki kelime arayan kodlar
+    words = re.findall(r'\w+', text.lower())
+    return [word for word in words if len(word) > 3]
+
+def find_related_threads(thread, max_results=5):
+    text = thread.title + " " + thread.content
+    keywords = extract_keywords(text)
+
+    query = Q()
+    for word in keywords:
+        query |= Q(title__icontains=word) | Q(content__icontains=word)
+
+ # Sadece aynı kategoriye sahip başlıklar içinde ara
+     # Sadece aynı kategorilerde olan başlıkları getir
+    same_category_threads = Thread.objects.filter(categories__in=thread.categories.all()).exclude(id=thread.id).distinct()
+
+    possible_matches = same_category_threads.filter(query)
+
+
+    results = []
+    for t in possible_matches:
+        other_text = t.title + " " + t.content
+        other_keywords = set(extract_keywords(other_text))
+        match_score = len(set(keywords) & other_keywords)
+        results.append((match_score, t))
+
+    results.sort(reverse=True, key=lambda x: x[0])
+    return [t for score, t in results[:max_results]]
 
 def category_detail(request, category_id):
     category = get_object_or_404(ForumCategory, id=category_id)
