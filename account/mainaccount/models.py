@@ -71,7 +71,7 @@ class ForumCategory(models.Model):
 
     def __str__(self):
         return self.name
-
+        
 class Thread(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
@@ -79,21 +79,18 @@ class Thread(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     categories = models.ManyToManyField(ForumCategory, related_name='threads')
     views = models.PositiveIntegerField(default=0)
-    like_count = models.IntegerField(default=0)  # Veritabanındaki alan
-    dislike_count = models.IntegerField(default=0)  # Veritabanındaki alan
+    like_count = models.IntegerField(default=0)
+    dislike_count = models.IntegerField(default=0)
+    related_threads = models.ManyToManyField('self', blank=True)
 
-    
 
     def __str__(self):
         return self.title
 
-    @property
-    def actual_like_count(self):  # 'like_count' metodunu değiştiriyoruz
-        return self.votes.filter(value='like').count()  # 'votes' kullanıyoruz
-
-    @property
-    def actual_dislike_count(self):  # 'dislike_count' metodunu değiştiriyoruz
-        return self.votes.filter(value='dislike').count()  # 'votes' kullanıyoruz
+    def update_vote_counts(self):
+        self.like_count = self.votes.filter(value='like').count()
+        self.dislike_count = self.votes.filter(value='dislike').count()
+        self.save(update_fields=['like_count', 'dislike_count'])
 
 class ThreadVote(models.Model):
     LIKE_CHOICES = [

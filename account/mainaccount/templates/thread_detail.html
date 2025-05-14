@@ -18,22 +18,22 @@
     <p>Oluşturan: {{ thread.user.username }} - {{ thread.created_at|date:"d M Y H:i" }}</p>
     <p>{{ thread.content }}</p>
     <!-- Beğenme ve Beğenmeme Butonlarını Herkes İçin Göster -->
-  <form method="POST" action="{% if user.is_authenticated %}{% url 'vote_thread' thread.id 'like' %}{% else %}{% url 'login_view' %}{% endif %}">
-    {% csrf_token %}
-    <button class="btn btn-primary">
-        <i class="fas fa-thumbs-up"></i> Like
-        {{ thread.actual_like_count }}
+  <form class="vote-form" data-vote-type="like" data-thread-id="{{ thread.id }}">
+  {% csrf_token %}
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-thumbs-up"></i> Like
+      <span class="like-count">{{ thread.like_count }}</span>
     </button>
   </form>
 
-  <form method="POST" action="{% if user.is_authenticated %}{% url 'vote_thread' thread.id 'dislike' %}{% else %}{% url 'login_view' %}{% endif %}">
-    {% csrf_token %}
-    <button class="btn btn-danger">
-        <i class="fas fa-thumbs-down"></i> Dislike
-        {{ thread.actual_dislike_count }}
+  <form class="vote-form" data-vote-type="dislike" data-thread-id="{{ thread.id }}">
+  {% csrf_token %}
+    <button type="submit" class="btn btn-danger">
+      <i class="fas fa-thumbs-down"></i> Dislike
+      <span class="dislike-count">{{ thread.dislike_count }}</span>
     </button>
   </form>
-    <p>👍 {{ thread.actual_like_count }} | 👎 {{ thread.actual_dislike_count }}</p>
+    <p>👍 {{ thread.like_count }} | 👎 {{ thread.dislike_count }}</p>
 
   
   <button onclick="toggleReplyForm()">Cevapla</button>
@@ -57,6 +57,7 @@
       <p>Henüz yanıt yok.</p>
     {% endfor %}
   </div>
+  
 
   {% if user.is_authenticated %}
   <!-- Alt Genel Cevap Formu -->
@@ -70,10 +71,9 @@
       ✔️ Cevabınız gönderildi
     </div>
   </div>
-{% else %}
-  <p>Yanıt yazmak için <a href="{% url 'login_view' %}">giriş yapın</a>.</p>
-{% endif %}
-
+  {% else %}
+    <p>Yanıt yazmak için <a href="{% url 'login_view' %}">giriş yapın</a>.</p>
+  {% endif %}
 
 
    <form id="mainReplyForm" onsubmit="handleMainReply(event)">
@@ -91,19 +91,59 @@
   
 
   </div>
-    <!-- Sağ: Yeni Konular -->
-  <div class="right-sidebar"><!--sağı doldurabiliriz böyle menülerle-->
-        <h3>Yeni Konular</h3>
-        <ul class="topic-list">
-          <li><a href="#">Vue vs React: Hangisi?</a></li>
-          <li><a href="#">En İyi Python Kütüphaneleri</a></li>
-          <li><a href="#">VSCode Eklenti Önerileri</a></li>
-          <li><a href="#">Django Başlangıç Rehberi</a></li>
-        </ul>
-       <!-- Yeni Başlık Dropdown Butonu -->
+    <!-- Sağ: ilgili konular -->
+  <div class="right-sidebar">
+        {% if thread.related_threads.all %}
+    <h3>İlgili Başlıklar</h3>
+    <ul class="topic-list">
+      {% for rel in thread.related_threads.all %}
+        <li><a href="{% url 'thread_detail' rel.id %}">{{ rel.title }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
   <div class="new_topic">
     <button onclick="toggleTopicForm()">+ Yeni Konu</button>
   </div>
+  </div>
+
+  <script>
+  document.querySelectorAll('.vote-form').forEach(form => {// beğeni işlemlerinden sonra geri dönülmek istendiğinde artık tek tık yetiyor. ajax kodunu düzelttim.
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); // Sayfanın yönlenmesini engelle
+
+        const voteType = this.dataset.voteType;
+        const threadId = this.dataset.threadId;
+        const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(`/thread/${threadId}/vote/${voteType}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Accept': 'application/json',
+            },
+        })
+        .then(response => {
+            if (response.status === 403) {
+                // Giriş yapılmamış → login sayfasına yönlendir
+                window.location.href = '/login/';
+                return;
+            }
+            if (!response.ok) {
+                throw new Error('Oy kullanma hatası');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data) return;
+            document.querySelector('.like-count').textContent = data.like_count;
+            document.querySelector('.dislike-count').textContent = data.dislike_count;
+        })
+        .catch(error => {
+            console.error('Hata:', error);
+        });
+    });
+  });
+</script>
  
   
   <script>// java kodlarını henüz ayırmadım bir şey kesinleşmediği için
