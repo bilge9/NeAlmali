@@ -11,10 +11,10 @@ from .models import (
     Reply,
     Cart,
     CartItem,
-    Favorite
+    Favorite,
+    ProductReview,
 )
-from mptt.admin import MPTTModelAdmin
-
+from mptt.admin import MPTTModelAdmin, DraggableMPTTAdmin
 # === ProductAttributeValue Inline ===
 class ProductAttributeValueInline(admin.TabularInline):
     model = ProductAttributeValue
@@ -36,10 +36,10 @@ class ProductAdmin(admin.ModelAdmin):
 
 # === Category Admin (MPTT ile) ===
 @admin.register(Category)
-class CategoryAdmin(MPTTModelAdmin):
-    list_display = ('name', 'parent')
+class CategoryAdmin(DraggableMPTTAdmin):
+    list_display = ('tree_actions', 'indented_title', 'highlighted')
+    list_filter = ('highlighted',)
     search_fields = ('name',)
-    ordering = ('name',)
 
 # === ProductImage Admin ===
 @admin.register(ProductImage)
@@ -93,3 +93,11 @@ class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'product', 'created_at')
     search_fields = ('user__username', 'product__name')
     list_filter = ('created_at',)
+
+# === ProductReview Admin ===
+@admin.register(ProductReview)
+class ProductReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'rating', 'created_at')
+    search_fields = ('product__name', 'user__username')
+    list_filter = ('rating', 'created_at')
+    ordering = ('-created_at',)

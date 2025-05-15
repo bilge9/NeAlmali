@@ -8,6 +8,10 @@ class Category(MPTTModel):
     name = models.CharField(max_length=100)
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
+    image = models.ImageField(upload_to='category_images/', null=True, blank=True, verbose_name="Ana Resim")
+    hover_image = models.ImageField(upload_to='category_images/', null=True, blank=True, verbose_name="Hover Resim")
+    highlighted = models.BooleanField(default=False, verbose_name="Öne Çıkan Kategori")
+
     def __str__(self):
         return self.name
 

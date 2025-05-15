@@ -82,10 +82,15 @@ def logout_view(request):
 
 def shopping(request):
     categories = Category.objects.all()  # Tüm kategorileri al
+    highlighted_categories = Category.objects.filter(highlighted=True)
+    products = Product.objects.all()
 
     return render(request, 'shopping.html', {
-        'categories': categories
+        'categories': categories,
+        'highlighted_categories': highlighted_categories,
+        'products': products
     })
+
 
 def shop_categories(request, category_id):
     category = get_object_or_404(Category, id=category_id)
@@ -174,30 +179,38 @@ def product_info(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     reviews = product.reviews.all()
     form = None
+    has_reviewed = False
+    user_purchased = False
 
     # Yorum yapabilmek için kullanıcı doğrulaması ve ürünü satın almış olma kontrolü
-    if request.user.is_authenticated and user_has_purchased(request.user, product):
-        if request.method == 'POST':
-            form = ProductReviewForm(request.POST)
-            if form.is_valid():
-                # Yorum kaydetme işlemi
-                review = form.save(commit=False)
-                review.product = product
-                review.user = request.user
-                review.save()
-                
-                # Başarı mesajı ekleyelim
-                messages.success(request, 'Yorumunuz başarıyla gönderildi!')
-                
-                # Yorum yapıldıktan sonra sayfayı yenileyip formu sıfırlıyoruz
-                return redirect('product_info', product_id=product.id)
-        else:
-            form = ProductReviewForm()  # İlk sayfa yüklenirken boş formu gönder
+    if request.user.is_authenticated:
+        user_purchased = user_has_purchased(request.user, product)
+        has_reviewed = reviews.filter(user=request.user).exists()
+
+        if user_purchased and not has_reviewed:
+            if request.method == 'POST':
+                form = ProductReviewForm(request.POST)
+                if form.is_valid():
+                    # Yorum kaydetme işlemi
+                    review = form.save(commit=False)
+                    review.product = product
+                    review.user = request.user
+                    review.save()
+                    
+                    # Başarı mesajı ekleyelim
+                    messages.success(request, 'Yorumunuz başarıyla gönderildi!')
+                    
+                    # Yorum yapıldıktan sonra sayfayı yenileyip formu sıfırlıyoruz
+                    return redirect('product_info', product_id=product.id)
+            else:
+                form = ProductReviewForm()  # İlk sayfa yüklenirken boş formu gönder
 
     return render(request, 'product_info.html', {
         'product': product,
         'form': form,
-        'reviews': reviews
+        'reviews': reviews,
+        'has_reviewed': has_reviewed,
+        'user_purchased': user_purchased,
     })
 
 # Forum Kısmı

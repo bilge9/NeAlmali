@@ -1,12 +1,19 @@
+body {
+    font-family: sans-serif;
+    background-color: #fff2f2 !important;
+    margin: 0;
+    padding: 0;
+}
+
 .search-bar {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-grow: 0.325;
-    }
+}
     
-    .search-bar input {
+.search-bar input {
     background-color: transparent;
     border: 1.75px solid #1b0122;
     color: #1b0122;
@@ -16,13 +23,13 @@
     padding-right: 40px;
     border-radius: 30px;
     flex-grow: 1;
-    }
+}
     
-    .search-bar input:focus {
+.search-bar input:focus {
     border-color: #1b0122;
-    }
+}
     
-    .search-bar .input-group-text {
+.search-bar .input-group-text {
     background-color: transparent;
     border: 1.75px solid #1b0122;
     border-left: none;
@@ -33,30 +40,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
     
-    }
-    
-    .input-group .form-control {
+.input-group .form-control {
     border-top-left-radius: 30px;
     border-bottom-left-radius: 30px;
     border-right: none; /* Butonla birleşme hatası olmaması için */
-    }
+}
     
-    .input-group .input-group-text {
+.input-group .input-group-text {
     border-top-right-radius: 30px;
     border-bottom-right-radius: 30px;
     border-left: none;
     background-color: transparent;
     border: 1.75px solid #1b0122;
     border-left: none;
-    }
-
-body {
-    font-family: sans-serif;
-    background: #faebdc;
-    margin: 0;
-    padding: 0;
 }
+
+
 .shop-hero {
     margin-top: 0px;
     width: 100%;
@@ -88,7 +89,7 @@ body {
     color: #1b0701;
     padding: 14px 45px;
     border-radius: 15px;
-    font-size: 14.5px;
+    font-size: 14.5px bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -148,18 +149,18 @@ body {
 .slider-container {
     position: relative;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 50px auto; /* Ortalar */
     overflow: hidden;
-    background: 	#F9F4EF;
-    padding: 200px 0;
+    background:#fff1e3;
+    padding: 10px 0;
     border-radius: 10px;
-    height: auto;
+    height: 400px; /* İstersen arttır */
 }
-  
+
 .slider-track {
     display: flex;
-  
+    gap: 5px;
     width: calc(200%);
     align-items: center;
     width: fit-content;
@@ -169,18 +170,68 @@ body {
   
   
 .slide { 
-    flex: 0 0 25%; /* 4 ürün = %25 */
+    flex: 0 0 10%; /* 4 ürün = %25 */
     max-width: 50%;
     box-sizing: border-box;
-    padding: 10px;
-    background: #ddd; /* gri görünmesi için */
+    padding: 5px;
     border-radius: 10px;
-    min-height: 250px; /* İstersen arttır */
+    min-height: 400px; /* İstersen arttır */
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px;
     font-weight: bold;
+    gap : 2px;
+}
+
+.product-wrap{
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;  
+    text-align: left;
+    transition: 0.3s;
+
+}
+
+.product-img{
+    width: 200px;
+    height: auto;
+    overflow: hidden;
+    margin-bottom: 5px;
+    object-position: center;
+    position: relative;
+   
+}
+
+.product-img img{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.25s ease;
+}
+
+.product-info{
+    margin-bottom: 10px;
+    margin-top: 0px;
+    margin-left: 10px;
+    font-family:'Times New Roman', Times, serif;
+    font-size: 15px;
+}
+.product-wrap .rating{
+    margin-top: 0;
+    margin-bottom: 0;   
+}
+
+.product-wrap span{
+    font-size: 14px;
+    width: 50%;
+}
+
+.product-wrap h6 {
+    margin: 5px 0 5px;
 }
   
 .nav-btn {
@@ -238,7 +289,7 @@ body {
     border-radius: 10px;
     width: 460px;
     height: 270px;
-    background-image: url('/pictures/saat.jpg');
+    background-image: url('pictures/kampanya1.png');
     background-position: center;
     background-repeat: no-repeat;
     transition: transform 0.2s;
@@ -251,7 +302,7 @@ body {
   
   /*altta öne çıkarılan kategoriler kısmı için*/
 .kategori-alt-wrap {
-    background-color: #f0f0f0; 
+    background-color: #ffeaea; 
     padding: 45px 25px;
     margin-top: 50px ;
     margin-bottom: 0px ;
@@ -259,6 +310,14 @@ body {
   
 .kategori-alt {
     margin-bottom: 25px;
+}
+
+.kategori-alt a {
+    font-size: 15px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: black;
+    text-decoration: none;
 }
   
   
@@ -274,13 +333,14 @@ body {
     position: relative;
     padding: 50px;
     border-radius: 100px;
-    background-color: #f04f53;
+    background-color: #e2a3a4;
     transition: transform 0.2s;
     width: 175px;
     height: 175px;
     margin: auto;
     overflow: hidden;
     background-position-x: center;
+    
 }
 .zoom1 img{
     position: absolute;

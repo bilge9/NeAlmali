@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {%load static%}
+{% load image_filters %}
 
 {% block title %}NeAlmalı - Shopping{% endblock %}
     
@@ -27,7 +28,7 @@
     
 {% block content %}
     <div class="shop-hero"><!--banner resmi-->
-      <img src="/pictures/shopbanner.png">
+      <img src={% static "pictures/bannershop.png"%} alt="banner" class="shop-banner" style="width: 100%;">
     </div>
 
     <div class="kategori-container"><!-- kategoriler kısmı-->
@@ -62,14 +63,36 @@
     <button class="nav-btn left-btn">&#10094;</button>
   
     <div class="slider-track">
-      <div class="slide">Ürün 1</div>
-      <div class="slide">Ürün 2</div>
-      <div class="slide">Ürün 3</div>
-      <div class="slide">Ürün 4</div>
-      <div class="slide">Ürün 1</div> <!-- Tekrarlar için -->
-      <div class="slide">Ürün 2</div>
-      <div class="slide">Ürün 3</div>
-      <div class="slide">Ürün 4</div>
+      {% for product in products %}
+        <div class="slide">
+          <div class="product-wrap">
+              <a href="{% url 'product_info' product.id %}"> 
+              
+              <div class="product-img">
+                {% with product.images|get_main_image as main_image %}
+                  {% if main_image %}
+                    
+                      <img src="{{ main_image.image.url }}" alt="{{ product.name }}" />
+                    
+                  {% else %}
+                    <p>Görsel yok</p>
+                  {% endif %}
+                {% endwith %}
+              </div>
+              </a>
+              <div class="product-info">
+                <span class="rating">⭐⭐⭐☆☆</span>
+                <h6 class="urun-baslik">{{ product.name }}</h6>
+                <div class="urun-fiyat">${{ product.price }}</div>
+              </div>
+            
+            </div>
+          
+        </div>
+
+        
+      {% endfor %}
+      
     </div>
   
     <button class="nav-btn right-btn">&#10095;</button>
@@ -108,64 +131,22 @@
       <p>metin metin metin metin</p>
     </div> 
     <div class="kategori-alt-container">
-      <div class="kategori-alt">
-        <a href="#">
-          <div class="zoom1">
-            <p>Kadın</p>
-            <img class="resim1" src={% static 'pictures/imageplaceholder.png' %} width="150" height="150" alt="ana resim">
-            <img class="resim2" src={% static 'pictures/imageplaceholder2.png' %} width="150" height="150" alt="hover resim">
-          </div>
-        </a>
-      </div>
+      {% for category in highlighted_categories %}
+        <div class="kategori-alt">
+          <a href="{% url 'shop_categories' category.id %}">
+            <div class="zoom1">
+              {% if category.image %}
+                <img class="resim1" src="{{ category.image.url }}" alt="{{ category.name }}">
+              {% endif %}
 
-      <div class="kategori-alt">
-        <a href="#">
-          <div class="zoom1">
-            <p>Erkek</p>
-            <img class="resim1" src={% static 'pictures/imageplaceholder.png'%} width="150" height="150" alt="ana resim">
-            <img class="resim2" src={% static 'pictures/imageplaceholder2.png'%} width="150" height="150" alt="hover resim">
-
-          </div>
-        </a>
-      </div>
-      <div class="kategori-alt">
-        <a href="#">
-          <div class="zoom1">
-            <p>Bilgisayar</p>
-            <img class="resim1" src={% static 'pictures/imageplaceholder.png'%} width="150" height="150" alt="ana resim">
-            <img class="resim2" src={% static 'pictures/imageplaceholder2.png'%} width="150" height="150" alt="hover resim">
-
-          </div>
-        </a>
-      </div>
-      <div class="kategori-alt">
-        <a href="#">
-          <div class="zoom1">
-            <p></p>
-            <img class="resim1" src={% static 'pictures/imageplaceholder.png'%} width="150" height="150" alt="ana resim">
-            <img class="resim2" src={% static 'pictures/imageplaceholder2.png'%} width="150" height="150" alt="hover resim">
-
-          </div>
-        </a>
-      </div>
-      <div class="kategori-alt">
-        <a href="#">
-          <div class="zoom1">
-            <img class="resim1" src={% static 'pictures/imageplaceholder.png'%} width="150" height="150" alt="ana resim">
-            <img class="resim2" src={% static 'pictures/imageplaceholder2.png'%} width="150" height="150" alt="hover resim">
-
-          </div>
-        </a>
-      </div>
-      <div class="kategori-alt">
-        <a href="#">
-          <div class="zoom1">
-            <img class="resim1" src={% static 'pictures/imageplaceholder.png'%} width="150" height="150" alt="ana resim">
-            <img class="resim2" src={% static 'pictures/imageplaceholder2.png'%} width="150" height="150" alt="hover resim">
-
-          </div>
-        </a>
-      </div>
+              {% if category.hover_image %}
+                <img class="resim2" src="{{ category.hover_image.url }}" alt="{{ category.name }} hover">
+              {% endif %}
+            </div>
+            <p style="text-align: center; margin-top: 10px;">{{ category.name }}</p>
+          </a>
+        </div>
+      {% endfor %}
     </div>
   </div>
   

@@ -6,6 +6,6 @@ class ProductReviewForm(forms.ModelForm):
         model = ProductReview
         fields = ['rating', 'comment']
         widgets = {
-            'rating': forms.NumberInput(attrs={'min': 1, 'max': 5, 'class': 'form-control'}),
+            'rating': forms.HiddenInput(),  # Gizli input
             'comment': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
