@@ -37,6 +37,34 @@ body {
   font-weight: bold;
 }
 
+.product-info a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.product-info h5 {
+  font-size: 20px;
+  margin-top: 20px;
+}
+
+.product-info p {
+  font-size: 16px;
+  margin-top: 10px;
+  line-height: 1.5;
+  color: #000000;
+  padding-left: 50px;
+  text-transform: capitalize;
+}
+
+.list-unstyled {
+  list-style-type: disc !important;
+  padding: 0 0 0 20px !important;
+  text-transform: capitalize;
+  font-size: 16px;
+}
+
 /* Yorum Kutuları (Yatay Slider) */
 .review-slider {
   display: flex;

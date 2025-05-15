@@ -94,7 +94,14 @@
               </div>
               </a>
               <div class="product-info">
-                <span class="rating">⭐⭐⭐☆☆</span>
+                <div class="rating">
+                  {% if product.average_rating %}
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <span class="text-muted">({{ product.average_rating|floatformat:1 }})</span>
+                  {% else %}
+                    <span class="text-muted">Yorum yok</span>
+                  {% endif %}
+                </div>
                 <h6 class="urun-baslik">{{ product.name }}</h6>
                 <div class="urun-fiyat">${{ product.price }}</div>
                 <button class="urun-button"><a href="{% url 'add_to_cart' product.id%}">Sepete Ekle</a></button>

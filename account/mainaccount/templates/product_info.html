@@ -50,9 +50,17 @@
 
             <!-- Ürün Bilgileri -->
             <div class="col-md-5 product-info">
-                <h2>{{ product.brand }}</h2>
-                <p class="text-muted">{{ product.name }}</p>
-                <h4 class="price">{{ product.price }} €</h4>
+                <h2>{{ product.brand }} {{ product.name }}</h2>
+                <h4 class="price">{{ product.price }} TL</h4>
+
+                <div class="rating">
+                    {% if product.average_rating %}
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <span class="text-muted">({{ product.average_rating|floatformat:1 }})</span>
+                    {% else %}
+                        <span class="text-muted">Yorum yok</span>
+                    {% endif %}
+                </div>
 
                 <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark w-100 mb-3">Sepete Ekle</a>
 

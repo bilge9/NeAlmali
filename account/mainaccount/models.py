@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User#yt
 from mptt.models import MPTTModel, TreeForeignKey
+from django.db.models import Avg
 
 # Create your models here.
 
@@ -28,6 +29,11 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @property
+    def average_rating(self):
+        avg = self.reviews.aggregate(Avg('rating'))['rating__avg']
+        return round(avg, 1) if avg else None
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)

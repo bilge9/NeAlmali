@@ -100,7 +100,9 @@ body {
 
 .kategori-kutu a{
     text-decoration: none;
-    color: black
+    color: black;
+    font-size: 18px;
+    font-weight: 600;
 }
     
 .mega-menu {
@@ -289,7 +291,6 @@ body {
     border-radius: 10px;
     width: 460px;
     height: 270px;
-    background-image: url('pictures/kampanya1.png');
     background-position: center;
     background-repeat: no-repeat;
     transition: transform 0.2s;
