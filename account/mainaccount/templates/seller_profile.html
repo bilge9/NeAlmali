@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load image_filters %}
+
+{% block title %}NeAlmalı - Satıcı Profili{% endblock %}
+
+{% block link %}
+    <link rel="stylesheet" href="{% static 'css/seller_profile.css' %}">
+{% endblock %}
+
+{% block message %}
+    {% include "message_box.html" %}
+{% endblock message %}
+
+{% block content %}
+
+<div class="profile-container">
+    <div class="seller-header">
+        <h2>{{ profile.store_name }} ({{ user.username }})</h2>
+        <p>{{ profile.bio }}</p>
+    </div>
+
+    <button id="toggle-form-btn" onclick="toggleForm()">+ Ürün Ekle</button>
+
+    <div id="add-product-form">
+        <h3>Yeni Ürün Ekle</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <h4>Ürün Bilgileri</h4>
+            {{ product_form.as_p }}
+
+            <h4>Görseller</h4>
+            <div id="image-container">
+                <div class="image-group">
+                    <input type="file" name="images">
+                    <label><input type="radio" name="main_image_index" value="0" checked> Ana görsel</label>
+                </div>
+            </div>
+            <button type="button" onclick="addImageField()">+ Görsel Ekle</button>
+
+            <h4>Özellikler</h4>
+            <div id="attribute-container">
+                <input type="text" name="attributes_name" placeholder="Özellik Adı">
+                <input type="text" name="attributes_value" placeholder="Özellik Değeri">
+            </div>
+            <button type="button" onclick="addAttributeField()">+ Özellik Ekle</button>
+
+            <div class="form-buttons">
+                <button type="submit">Ürünü Kaydet</button>
+            </div>
+        </form>
+    </div>
+
+    <h3>Ürünlerim</h3>
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="product-wrap">
+              <a href="{% url 'product_info' product.id %}"> 
+              
+              <div class="product-img">
+                {% with main_image=product.images.all|get_main_image hover_image=product.images.all|get_hover_image %}
+                  {% if main_image %}
+                    <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="main-img">
+                  {% else %}
+                    <img src="{% static 'pictures/imageplaceholder.png' %}" alt="{{ product.name }}" class="main-img">
+                  {% endif %}
+              
+                  {% if hover_image %}
+                    <img src="{{ hover_image.image.url }}" alt="{{ product.name }} Hover" class="hover-img">
+                  {% else %}
+                    <img src="{% static 'pictures/imageplaceholder2.png' %}" alt="{{ product.name }} Hover" class="hover-img">
+                  {% endif %}
+                {% endwith %}
+              </div>
+              </a>
+              <div class="product-info">
+                <div class="rating">
+                  {% if product.average_rating %}
+                    <i class="bi bi-star-fill text-warning"></i>
+                    <span class="text-muted">({{ product.average_rating|floatformat:1 }})</span>
+                  {% else %}
+                    <span class="text-muted">Yorum yok</span>
+                  {% endif %}
+                </div>
+                <h6 class="urun-baslik">{{ product.name }}</h6>
+                <div class="urun-fiyat">${{ product.price }}</div>
+              </div>
+            
+            </div>
+          {% endfor %}
+          {% if not products %}
+            <div class="no-products">
+              <p>Bu kategoride ürün bulunmamaktadır.</p>
+            </div>
+          {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+  <script src={% static 'js/seller_profile.js' %}></script>
+{% endblock  %}

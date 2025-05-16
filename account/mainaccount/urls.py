@@ -24,5 +24,5 @@ urlpatterns = [
     #favorilerim
     path('favorites/add/<int:product_id>/', views.add_to_favorites, name='add_to_favorites'),
     path('favorites/', views.favorite_list, name='favorite_list'),
-    
+    path('seller/profile/', views.seller_profile, name='seller_profile'),
 ]

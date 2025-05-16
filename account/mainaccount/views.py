@@ -3,10 +3,10 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, ProductAttributeValue, Category, ForumCategory, Thread, Reply, ThreadVote, Cart, CartItem, Favorite
+from .models import Product, Attribute, ProductAttributeValue, ProductImage, SellerProfile,  Category, ForumCategory, Thread, Reply, ThreadVote, Cart, CartItem, Favorite
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
-from .forms import ProductReviewForm
+from .forms import ProductReviewForm, ProductForm
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
 from django.db.models import Q
@@ -25,8 +25,8 @@ def register(request):
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
         next_page = request.POST.get('next') or 'index'  # fallback to index if boş
+        is_seller = request.POST.get('is_seller') == 'on'
 
-        print(f"Formdan gelen bilgiler: {full_name}, {email}, {password}")  # Debug
         if password != confirm_password:
             messages.error(request , 'Şifreler eşleşmiyor.')
             return redirect('register')
@@ -47,6 +47,14 @@ def register(request):
             last_name=last_name
         )
         
+        # ✅ Satıcı ise SellerProfile oluştur
+        if is_seller:
+            from .models import SellerProfile
+            SellerProfile.objects.create(
+                user=user,
+                store_name=f"{full_name} Store",  # Basit bir varsayılan değer
+                is_approved=False  # Admin onaylamalı
+            )
 
         login(request, user)
         messages.success(request, 'Başarıyla kaydoldunuz.')
@@ -136,40 +144,6 @@ def shop_categories(request, category_id):
         'query': query,  # Arama kutusunda geri göstermek için
     })
 
-
-def product_list(request):
-    color_filter = request.GET.get('color')
-    category_id = request.GET.get('category')
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-
-    products = Product.objects.all()
-    category_name = None
-
-    if category_id:
-        products = products.filter(category_id=category_id)
-        category = Category.objects.filter(id=category_id).first()
-        if category:
-            category_name = category.name
-    
-    if color_filter:
-        products =products.filter(color=color_filter)
-
-    if min_price:
-        products = products.filter(price__gte=min_price) # price__gte means price greater than or equal to min_price
-    
-    if max_price:
-        products = products.filter(price__lte=max_price) # price__lte means price less than or equal to max_price
-
-    context = {
-        'products': products,
-        'categories': Category.objects.all(),
-        'category_name': category_name,
-        'selected_color': color_filter,
-        'min_price': min_price,
-        'max_price': max_price,
-    }
-    return render(request, 'shopping.html', context)
 
 def user_has_purchased(user, product):
     # Sipariş sistemi varsa buraya kontrol eklenmeli
@@ -460,3 +434,43 @@ def add_to_favorites(request, product_id):
 def favorite_list(request):
     favorites = Favorite.objects.filter(user=request.user)
     return render(request, 'favorite_list.html', {'favorites': favorites})
+
+@login_required
+def seller_profile(request):
+    if request.method == 'POST':
+        product_form = ProductForm(request.POST)
+        if product_form.is_valid():
+            product = product_form.save(commit=False)
+            product.seller = request.user
+            product.save()
+
+            images = request.FILES.getlist('images')
+            main_index = int(request.POST.get('main_image_index', 0))  # Formdan gelen ana görselin index'i
+
+            for idx, img in enumerate(images):
+                ProductImage.objects.create(
+                    product=product,
+                    image=img,
+                    is_main=(idx == main_index)  # Sadece seçilen index ana görsel olur
+                )
+
+            names = request.POST.getlist('attributes_name')
+            values = request.POST.getlist('attributes_value')
+            for name, value in zip(names, values):
+                if name.strip():
+                    attr, _ = Attribute.objects.get_or_create(name=name.strip())
+                    ProductAttributeValue.objects.create(product=product, attribute=attr, value=value.strip())
+
+            return redirect('seller_profile')
+
+    else:
+        product_form = ProductForm()
+
+    products = Product.objects.filter(seller=request.user)
+    profile = SellerProfile.objects.get(user=request.user)
+
+    return render(request, 'seller_profile.html', {
+        'product_form': product_form,
+        'products': products,
+        'profile': profile,
+    })

@@ -1,5 +1,5 @@
 from django import forms
-from .models import ProductReview
+from .models import ProductReview ,Product
 
 class ProductReviewForm(forms.ModelForm):
     class Meta:
@@ -9,3 +9,8 @@ class ProductReviewForm(forms.ModelForm):
             'rating': forms.HiddenInput(),  # Gizli input
             'comment': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'brand', 'category','description', 'price' ]

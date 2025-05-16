@@ -13,8 +13,11 @@ from .models import (
     CartItem,
     Favorite,
     ProductReview,
+    SellerProfile
 )
-from mptt.admin import MPTTModelAdmin, DraggableMPTTAdmin
+from django.contrib.auth.models import User
+from mptt.admin import DraggableMPTTAdmin
+
 # === ProductAttributeValue Inline ===
 class ProductAttributeValueInline(admin.TabularInline):
     model = ProductAttributeValue
@@ -25,14 +28,25 @@ class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
 
+# === SellerProfile Admin ===
+@admin.register(SellerProfile)
+class SellerProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'store_name', 'is_approved']
+    list_filter = ['is_approved']
+
 # === Product Admin ===
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'category')
-    search_fields = ('name', 'category__name')
+    list_display = ('name', 'price', 'category', 'seller')  
+    search_fields = ('name', 'category__name', 'seller__username')  
     list_filter = ('category',)
     ordering = ('-price',)
     inlines = [ProductAttributeValueInline, ProductImageInline]
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "seller":
+            kwargs["queryset"] = User.objects.filter(seller_profile__isnull=False)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 # === Category Admin (MPTT ile) ===
 @admin.register(Category)

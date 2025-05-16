@@ -1,9 +1,18 @@
 from django.db import models
-from django.contrib.auth.models import User#yt
+from django.contrib.auth.models import User 
 from mptt.models import MPTTModel, TreeForeignKey
 from django.db.models import Avg
 
 # Create your models here.
+
+class SellerProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='seller_profile')
+    store_name = models.CharField(max_length=100)
+    bio = models.TextField(blank=True)
+    is_approved = models.BooleanField(default=False)  # Admin onayı
+
+    def __str__(self):
+        return f"{self.user.username} - {self.store_name}"
 
 class Category(MPTTModel):
     name = models.CharField(max_length=100)
@@ -20,6 +29,7 @@ class Category(MPTTModel):
         order_insertion_by = ['name']
 
 class Product(models.Model):
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     description = models.TextField(blank=True)
@@ -71,6 +81,11 @@ class ProductReview(models.Model):
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'product'], name='unique_product_review')
+        ]
+
     def __str__(self):
         return f"{self.user.username} - {self.product.name}"
 
@@ -92,7 +107,6 @@ class Thread(models.Model):
     like_count = models.IntegerField(default=0)
     dislike_count = models.IntegerField(default=0)
     related_threads = models.ManyToManyField('self', blank=True)
-
 
     def __str__(self):
         return self.title
