@@ -19,8 +19,10 @@ urlpatterns = [
     path('category/<int:category_id>/threads/', views.category_threads, name='category_threads'),
     path('kategoriler/', views.category_list, name='category_list'),
     #sepet
-    path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/', views.cart_detail, name='cart_detail'),
+    path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('cart/update/<int:item_id>/', views.update_cart_item, name='update_cart_item'),
+    path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     #favorilerim
     path('favorites/add/<int:product_id>/', views.add_to_favorites, name='add_to_favorites'),
     path('favorites/', views.favorite_list, name='favorite_list'),

@@ -1,8 +1,57 @@
-<h2>Sepetiniz</h2>
-<ul>
-  {% for item in cart.items.all %}
-    <li>{{ item.product.name }} - {{ item.quantity }} adet - Toplam: {{ item.get_total_price }} TL</li>
-  {% endfor %}
-</ul>
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sepetiniz</title>
+  <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h2>Sepetim ({{ cart.items.count }} Ürün)</h2>
 
-<p><strong>Toplam:</strong> {{ total }} TL</p>
+    {% if items %}
+      <div class="cart-items">
+        {% for item in cart.items.all %}
+          <div class="cart-item">
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+            <div class="item-info">
+              <p class="title">{{ item.product.name }}</p>
+              <p class="delivery">Tahmini Kargoya Teslim: 2 gün içinde</p>
+              <div class="quantity-price">
+                <div class="quantity">
+                  <form method="post" action="{% url 'update_cart_item' item.id %}">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="decrease">-</button>
+                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" readonly>
+                    <button type="submit" name="action" value="increase">+</button>
+                  </form>
+                </div>
+                <div class="price">{{ item.get_total_price }} TL</div>
+              </div>
+            </div>
+            <form method="post" action="{% url 'remove_from_cart' item.id %}">
+              {% csrf_token %}
+              <button class="delete">Sil</button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="summary">
+        <h3>Sipariş Özeti</h3>
+        <p>Ürünün Toplamı: <span>{{ total }} TL</span></p>
+        <p>Kargo Toplam: <span>44,99 TL</span></p>
+        <p>Kargo İndirimi: <span>-44,99 TL</span></p>
+        <hr>
+        <p class="total">Toplam: <span>{{ total }} TL</span></p>
+        <button class="confirm">Sepeti Onayla</button>
+      </div>
+    
+    {% else %}
+      <p>Sepetiniz boş.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
