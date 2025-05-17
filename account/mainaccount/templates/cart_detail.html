@@ -1,13 +1,27 @@
+{% extends 'base.html' %}
 {% load static %}
 <!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sepetiniz</title>
-  <link rel="stylesheet" href="{% static 'css/cart.css' %}">
-</head>
-<body>
+
+{% block link %}
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+{% endblock %}
+
+{%block search-bar%}
+<!-- Arama çubuğu -->
+ <form method="get" action="">
+  <div class="search-bar">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Ürün ara..." value="{{ query|default_if_none:'' }}">
+      <button class="input-group-text" type="submit">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </div>
+</form>
+
+{%endblock search-bar%}
+
+{% block content %}
   <div class="container">
     <h2>Sepetim ({{ cart.items.count }} Ürün)</h2>
 
@@ -15,7 +29,14 @@
       <div class="cart-items">
         {% for item in cart.items.all %}
           <div class="cart-item">
-            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+            <!-- Ürün Görseli -->
+                {% if product.images.first %}
+                    <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                    <img src="{% static 'no-image.png' %}" class="card-img-top" alt="Görsel yok">
+                {% endif %}
+
+
             <div class="item-info">
               <p class="title">{{ item.product.name }}</p>
               <p class="delivery">Tahmini Kargoya Teslim: 2 gün içinde</p>
@@ -53,5 +74,4 @@
       <p>Sepetiniz boş.</p>
     {% endif %}
   </div>
-</body>
-</html>
+{% endblock %}

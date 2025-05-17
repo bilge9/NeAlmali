@@ -156,6 +156,7 @@ def product_info(request, product_id):
     form = None
     has_reviewed = False
     user_purchased = False
+    is_favorited = False 
     
     # Session üzerinden seçilen ürün ID'lerini al (eğer session'da yoksa boş liste kullan)
     selected_ids = request.session.get('selected_product_ids', [])
@@ -169,6 +170,8 @@ def product_info(request, product_id):
     if request.user.is_authenticated:
         user_purchased = user_has_purchased(request.user, product)
         has_reviewed = reviews.filter(user=request.user).exists()
+        is_favorited = Favorite.objects.filter(user=request.user, product=product).exists()
+
 
         if user_purchased and not has_reviewed:
             if request.method == 'POST':
@@ -194,7 +197,7 @@ def product_info(request, product_id):
         'reviews': reviews,
         'has_reviewed': has_reviewed,
         'user_purchased': user_purchased,
-        
+        'is_favorited': is_favorited,
         "existing_ids": selected_ids,
         
     })
@@ -437,9 +440,10 @@ def category_threads(request, category_id):
 
 def cart_detail(request):
     cart = Cart.objects.get(user=request.user)
-    items = cart.items.all()
+    items = cart.items.select_related('product').all()
     total = sum(item.get_total_price() for item in items)
     return render(request, 'cart_detail.html', {
+        'cart': cart,
         'items': items,
         'total': total
     })
@@ -485,6 +489,12 @@ def add_to_favorites(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     Favorite.objects.get_or_create(user=request.user, product=product)
     return redirect('favorite_list')
+
+@login_required
+def remove_from_favorites(request, product_id):
+    Favorite.objects.filter(user=request.user, product_id=product_id).delete()
+    messages.success(request, "Favorilerden çıkarıldı.")
+    return redirect(request.META.get('HTTP_REFERER', 'favorite_list'))
 
 @login_required
 def favorite_list(request):

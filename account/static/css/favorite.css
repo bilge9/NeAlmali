@@ -1,0 +1,26 @@
+.mt-7 {
+    margin-top: 100px;
+}
+.text-orange {
+    color: #f68b1e;
+}
+
+.product-card img {
+    height: 250px;
+    object-fit: cover;
+}
+
+.product-card .card-body {
+    padding: 1rem;
+}
+
+.product-card .btn-outline-dark {
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.product-card .card-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    min-height: 3em;
+}
