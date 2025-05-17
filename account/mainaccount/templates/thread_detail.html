@@ -8,8 +8,6 @@
   <link rel="stylesheet" href={% static 'css/forum_caption.css'%} />
 </head>
 <body>
-<!--bu kod forum sayfasında tıklanılan başlık sayafasına götüren sayfa aslında ama düzenlenmesi lazım çok karışık.-->
-<!--script dosyasını ayırmadım bunun en altında açıklamaları yazıcam-->
 
 <div class="main-container"><!--burdan aşağısı sayfanın genel tasarımı navbar ve kenarları falan doldurulmalı-->
   <!-- Sol: Cevaplar -->
@@ -17,6 +15,30 @@
     <h2 class="thread-title">{{ thread.title }}</h2>
     <p>Oluşturan: {{ thread.user.username }} - {{ thread.created_at|date:"d M Y H:i" }}</p>
     <p>{{ thread.content }}</p>
+    <img src="{{ urun.main_image.image.url }}" alt="Resim" class="urun-kart-img"><!--başlığa eklenen ürünler nasıl gözükecek-->
+    <p>{{ urun.main_image }}</p>
+
+        {% if thread.products.all %}
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        {% for urun in thread.products.all %}
+          <div class="urun-kart">
+            {% if urun.main_image %}
+              <img src="{{ urun.main_image.image.url }}" class="urun-kart-img">
+            {% else %}
+              <p>Görsel yok</p>
+            {% endif %}
+            <div class="urun-kart-detay">
+              <strong>{{ urun.name }}</strong><br>
+              <small>{{ urun.price }} ₺</small>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+
+
+
     <!-- Beğenme ve Beğenmeme Butonlarını Herkes İçin Göster -->
   <form class="vote-form" data-vote-type="like" data-thread-id="{{ thread.id }}">
   {% csrf_token %}
