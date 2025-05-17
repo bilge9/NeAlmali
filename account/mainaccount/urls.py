@@ -27,4 +27,9 @@ urlpatterns = [
     path('favorites/add/<int:product_id>/', views.add_to_favorites, name='add_to_favorites'),
     path('favorites/', views.favorite_list, name='favorite_list'),
     path('seller/profile/', views.seller_profile, name='seller_profile'),
+    path("urun-ara/", views.urun_ara, name="urun_ara"),#bu ürünü adını aratarak bulan url
+    path("forum/clear-selected-products/", views.clear_selected_products, name="clear_selected_products"),
+    path('forum/add/<int:product_id>/', views.add_product_to_session, name='add_product_to_session'),
+
 ]
+

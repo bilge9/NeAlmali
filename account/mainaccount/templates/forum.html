@@ -226,7 +226,14 @@
   </nav>
 {% endif %}
 
-
+<h3>Test: Seçilen Ürünler</h3>
+<ul>
+  {% for product in selected_products %}
+    <li>{{ product.name }}</li>
+  {% empty %}
+    <li>Seçilen ürün yok</li>
+  {% endfor %}
+</ul>
     <!-- forum sayfasında, başlık açma -->
   <div class="container my-5">
     <div class="row justify-content-center">
@@ -247,7 +254,7 @@
 
               <!-- İçerik -->
                 <div class="mb-3">
-                  <label for="content" class="form-label">İçerik</label>
+                  <label for="content" class="form-label">Ne düşünüyorsunuz?</label>
                   <textarea class="form-control" name="content" id="content" placeholder="İçerik" rows="5" required></textarea>
                 </div>
 
@@ -264,6 +271,31 @@
                     {% endfor %}
                   </div>
                 </div>
+                <!-- Seçili Ürünleri Formda Gizli Input ile göndermek için -->
+            <div class="selected-products"><!--formda seçilen ürünlerim listellendiği bir kısım eklendi-->
+                {% for product in selected_products %}
+                    <input type="hidden" name="selected_products" value="{{ product.id }}">
+                    <div class="product-card">
+                        {% if product.main_image %}
+                            <img src="{{ product.main_image.image.url }}" alt="{{ product.name }}" width="80">
+                        {% endif %}
+                        <p>{{ product.name }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if selected_products %}
+                <div class="mt-2">
+        <a href="{% url 'clear_selected_products' %}?next={{ request.GET.next }}" id="clear-selected-products">Seçilenleri Temizle</a>
+
+
+
+                </div>
+            {% endif %}
+                <label>Ürün Ekle (isteğe bağlı):</label>
+                <input type="text" id="productSearch" placeholder="Ürün adını yazın..." autocomplete="off">
+                <div id="productSuggestions" style="border:1px solid #ccc; max-height: 200px; overflow-y: auto;"></div>
+                <input type="hidden" name="urun_id" id="selectedProductId">
+                
 
               <!-- Gönder Butonu -->
                 <button type="submit" class="btn custom-btn">Yeni Başlık Oluştur</button>
@@ -314,6 +346,37 @@
   
     <!-- Daha fazla kategori ekleyebilirsin -->
   </div>
+  <script>// sayfayı yenildeiğinde geir dönmeye çalışınca doğru yere yönlendirmesi için
+document.addEventListener('DOMContentLoaded', function () {
+    const clearBtn = document.getElementById('clear-selected-products');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            fetch("{% url 'clear_selected_products' %}")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        // Sayfayı yeniden yükleme — ürün listesi temizlenmiş olarak kal
+                        location.reload();
+                    }
+                });
+        });
+    }
+});
+</script>
+
+  <script>// ürünlerin urllerle doğru olarak taşınabilmesi için
+    function clearSelectedProducts() {
+        fetch("{% url 'clear_selected_products' %}")
+            .then(() => {
+                // URL'deki parametreleri temizle ve sayfayı yeniden yükle
+                const url = new URL(window.location.href);
+                url.search = '';  // Tüm query parametrelerini kaldır
+                window.location.href = url.toString();
+            });
+    }
+</script>
+
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     document.querySelectorAll('.thread-box').forEach(function(box) {
@@ -357,4 +420,43 @@
   });
 });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {//ürün aramanın kodları
+  const searchInput = document.getElementById("productSearch");
+  const suggestionsBox = document.getElementById("productSuggestions");
+  const hiddenInput = document.getElementById("selectedProductId");
+
+  searchInput.addEventListener("input", function () {
+    const query = this.value.trim();
+    if (!query) {
+      suggestionsBox.innerHTML = "";
+      return;
+    }
+
+    fetch(`/urun-ara/?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        suggestionsBox.innerHTML = "";
+        data.forEach(item => {
+          const option = document.createElement("div");
+          option.style.cursor = "pointer";
+          option.style.display = "flex";
+          option.style.alignItems = "center";
+          option.style.padding = "5px";
+          option.innerHTML = `
+            <img src="${item.image}" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
+            <span>${item.name} - ${item.price} ₺</span>
+          `;
+          option.addEventListener("click", () => {
+            searchInput.value = item.name;
+            hiddenInput.value = item.id;
+            suggestionsBox.innerHTML = "";
+          });
+          suggestionsBox.appendChild(option);
+        });
+      });
+  });
+});
+</script>
+
   {% endblock %}

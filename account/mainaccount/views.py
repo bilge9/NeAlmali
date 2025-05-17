@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 import re
 from django.db.models import Q
+from django.urls import reverse
 
 def index(request):
     return render(request, 'index.html')
@@ -155,6 +156,14 @@ def product_info(request, product_id):
     form = None
     has_reviewed = False
     user_purchased = False
+    
+    # Session üzerinden seçilen ürün ID'lerini al (eğer session'da yoksa boş liste kullan)
+    selected_ids = request.session.get('selected_product_ids', [])
+    
+    # Eğer bu ürün session'da yoksa ekle (session'da sayıları string olarak saklayabilirsin)
+    if str(product_id) not in selected_ids:
+        selected_ids.append(str(product_id))
+        request.session['selected_product_ids'] = selected_ids
 
     # Yorum yapabilmek için kullanıcı doğrulaması ve ürünü satın almış olma kontrolü
     if request.user.is_authenticated:
@@ -185,13 +194,31 @@ def product_info(request, product_id):
         'reviews': reviews,
         'has_reviewed': has_reviewed,
         'user_purchased': user_purchased,
+        
+        "existing_ids": selected_ids,
+        
     })
 
 # Forum Kısmı
-def forum_page(request):
+def forum_page(request):# bu fonksiyon baya değişti
     categories = ForumCategory.objects.all()
     query = request.GET.get('q')
+    products = Product.objects.all() 
     
+    #  1. GET ile gelen product_id'leri session'a ekle
+    if request.method == "GET":
+        product_ids_from_url = request.GET.getlist("product_id")
+        existing_ids = request.session.get("selected_product_ids", [])
+        
+        for pid in product_ids_from_url:
+            if pid not in existing_ids:
+                existing_ids.append(pid)
+
+        request.session["selected_product_ids"] = existing_ids
+     # Session'dan seçili ürün ID'lerini al
+    preselected_ids = request.session.get('selected_product_ids', [])
+    selected_products = Product.objects.filter(id__in=preselected_ids)
+
     if query:
         thread_list = Thread.objects.filter(
             Q(title__icontains=query) |
@@ -224,7 +251,7 @@ def forum_page(request):
     else:
         threads = threads.order_by("-id")  # Varsayılan: en yeni başlıklar
     
-
+   
     if request.method == "POST":
         if not request.user.is_authenticated:
             return redirect('/giris-yap/?next=' + request.path)
@@ -232,20 +259,30 @@ def forum_page(request):
         title = request.POST.get("title")
         content = request.POST.get("content")
         category_ids = request.POST.getlist("categories")
+        product_ids = request.POST.getlist("selected_products")  # checkbox'lardan veya hidden inputlardan
 
         if title and content and category_ids:
             thread = Thread.objects.create(
                 title=title,
                 content=content,
-                user=request.user
+                user=request.user,
+                
             )
             thread.categories.set(category_ids)
+             # Seçilen ürünleri bağlayalım
+            if product_ids:
+                thread.products.set(Product.objects.filter(id__in=product_ids))
+
             thread.save()
              # İlgili başlıkları bul ve ata
             related = find_related_threads(thread)
             thread.related_threads.set(related)
             for r in related:
                 r.related_threads.add(thread)
+                 # Forum başlığı oluşturulduktan sonra session’daki seçili ürünleri temizle
+            request.session['selected_products_ids'] = []
+
+            messages.success(request, "Başlık başarıyla oluşturuldu!")
 
             return redirect("forum_page")
 
@@ -254,6 +291,9 @@ def forum_page(request):
         "categories": categories,
         "threads": threads,
         "query": query,
+        "products": products,  # tüm ürünler
+        "selected_products": selected_products,#seçilen ürünleri listeye  atıyo
+        "product_ids": '&'.join([f"product_id={pid}" for pid in preselected_ids]),
         "selected_categories": list(map(int, category_filter)) if category_filter else [],
         "sort_by": sort_by,  # Şablonda kullanılacak
     })
@@ -292,6 +332,11 @@ def thread_detail(request, thread_id):
                 content=content
             )
             return redirect('thread_detail', thread_id=thread_id)
+     # Ürünlerle ana resimleri eşle
+    product_images = {}
+    for product in thread.products.all():
+        main_image = product.images.filter(is_main=True).first()
+        product_images[product.id] = main_image
 
     return render(request, 'thread_detail.html', {
         'thread': thread,
@@ -485,3 +530,30 @@ def seller_profile(request):
         'products': products,
         'profile': profile,
     })
+
+def urun_ara(request):# ürün adını arayarak listeliyor ve seçtiriyo ona gröe ekleniyor
+    q = request.GET.get('q', '')
+    urunler = Product.objects.filter(name__icontains=q)[:10]
+    data = []
+    for u in urunler:
+        main_image = u.images.filter(is_main=True).first()
+        data.append({
+            "id": u.id,
+            "name": u.name,
+            "price": str(u.price),
+            "image": main_image.image.url if main_image else "",  # Boş kalabilir
+        })
+    return JsonResponse(data, safe=False)
+
+def clear_selected_products(request):# birden fazzla ürün eklenince seçimleri kaldırmaya yarayan kısım
+    request.session['selected_product_ids'] = []
+    return JsonResponse({'status': 'ok'})
+def add_product_to_session(request, product_id):# üürnleri ssesssiona ekleyerek birden fazla ürün eklenmes,ni sağlayan ksım 
+    selected_ids = request.session.get("selected_product_ids", [])
+    if product_id not in selected_ids:
+        selected_ids.append(product_id)
+        request.session["selected_product_ids"] = selected_ids
+        messages.success(request, "Ürün başarıyla eklendi.")
+    else:
+        messages.info(request, "Ürün zaten seçilmişti.")
+    return redirect('forum_page')

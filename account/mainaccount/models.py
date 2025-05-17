@@ -40,6 +40,9 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     
+    @property #propertyle resmi atamayı yt ekledi
+    def main_image(self):
+        return self.images.filter(is_main=True).first()
     @property
     def average_rating(self):
         avg = self.reviews.aggregate(Avg('rating'))['rating__avg']
@@ -107,7 +110,8 @@ class Thread(models.Model):
     like_count = models.IntegerField(default=0)
     dislike_count = models.IntegerField(default=0)
     related_threads = models.ManyToManyField('self', blank=True)
-
+    products = models.ManyToManyField(Product, blank=True, related_name='threads')# başlıklara eklenen ürünleri tutuyor
+    
     def __str__(self):
         return self.title
 
