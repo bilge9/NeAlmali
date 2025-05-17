@@ -25,6 +25,7 @@ urlpatterns = [
     path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     #favorilerim
     path('favorites/add/<int:product_id>/', views.add_to_favorites, name='add_to_favorites'),
+    path('favorites/remove/<int:product_id>/', views.remove_from_favorites, name='remove_from_favorites'),
     path('favorites/', views.favorite_list, name='favorite_list'),
     path('seller/profile/', views.seller_profile, name='seller_profile'),
     path("urun-ara/", views.urun_ara, name="urun_ara"),#bu ürünü adını aratarak bulan url

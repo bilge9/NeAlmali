@@ -1,6 +1,67 @@
-<h2>Favori Ürünleriniz</h2>
-<ul>
-  {% for fav in favorites %}
-    <li>{{ fav.product.name }} - {{ fav.product.price }} TL</li>
-  {% endfor %}
-</ul>
+{% extends 'base.html' %}
+{% load static %}
+
+{%block search-bar%}
+<!-- Arama çubuğu -->
+ <form method="get" action="">
+  <div class="search-bar">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Ürün ara..." value="{{ query|default_if_none:'' }}">
+      <button class="input-group-text" type="submit">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </div>
+</form>
+
+{%endblock search-bar%}
+
+{% block content %}
+<div class="container mt-7">
+    <h2 class="mb-3">Favorilerim</h2>
+    <link rel="stylesheet" href="{% static 'css/favorite.css' %}">
+
+    <!-- Filtre Butonları -->
+    <div class="d-flex gap-2 mb-4">
+        <button class="btn btn-outline-secondary active">Tümü</button>
+        <button class="btn btn-outline-danger">Fiyatı Düşenler</button>
+        <button class="btn btn-outline-primary">Avantajlı Ürünler</button>
+    </div>
+
+    <!-- Ürün Kartları -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for fav in favorites %}
+        <div class="col">
+            <div class="card h-100 product-card position-relative">
+                <!-- Ürün Görseli -->
+                {% if fav.product.images.first %}
+                    <img src="{{ fav.product.images.first.image.url }}" class="card-img-top" alt="{{ fav.product.name }}">
+                {% else %}
+                    <img src="{% static 'no-image.png' %}" class="card-img-top" alt="Görsel yok">
+                {% endif %}
+
+                <!-- Favoriden Kaldır Butonu -->
+                <form method="post" action="{% url 'remove_from_favorites' fav.product.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 rounded-circle shadow-sm">
+                        <i class="bi bi-x-lg text-danger"></i>
+                    </button>
+                </form>
+
+                <!-- Kart İçeriği -->
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title">{{ fav.product.brand }} {{ fav.product.name|truncatechars:40 }}</h6>
+                    <div class="mt-auto">
+                        <p class="text-orange fw-bold">{{ fav.product.price }} TL</p>
+                        <a href="{% url 'product_info' fav.product.id %}" class="btn btn-outline-dark w-100">Ürüne Git</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+            <p>Favori ürününüz yok.</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
