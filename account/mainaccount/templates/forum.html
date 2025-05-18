@@ -34,7 +34,7 @@
 
 {% block content %}
   <div id="banner" class="banner-container"><!--banner resmi-->
-    <img src="pictures/comp.jpg" alt="...">
+    <img src={% static "pictures/forumbanner.png"%} alt="banner">
   </div>
   <div class="category-bar" id="category-bar">
   <!-- Kategoriler buraya gelecek -->
@@ -375,6 +375,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = url.toString();
             });
     }
+
+    //forum kısmının kodları bunun için dediğim gibi karışıklık olmasın diye forum.js açmadım şuan
+const banner = document.getElementById('banner');
+let ticking = false;
+
+function updateBanner() {
+  const scrollY = window.scrollY;
+
+  let height = 300 - scrollY;
+  if (height < 80) height = 80;
+  if (height > 300) height = 300;
+
+  banner.style.height = `${height}px`;
+  ticking = false;
+}
+
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    window.requestAnimationFrame(updateBanner);
+    ticking = true;
+  }
+});
 </script>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
