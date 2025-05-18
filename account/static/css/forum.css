@@ -1,3 +1,6 @@
+body{
+  background-color: #ebe0ff !important;
+}
 .search-bar {
   position: relative;
   display: flex;
@@ -54,7 +57,7 @@
  /* Sol ve sağ kısmı ayıran çizgi */
 
  .border-end-md {
-    border-right: 1px solid #a092b1;
+    border-right: 1px solid #efe2ff;
   }
 
   /* List-group hover efekti */
@@ -80,7 +83,7 @@
     margin-bottom: 15px;
   }
   .forum-container{
-    background-color: #bda8d7;
+    background-color: #ffe8ef;
     margin: 100px;
     margin-top: 320px;
     border: 1px solid #bda8d7;
@@ -249,7 +252,7 @@ button.custom-btn {
 
 /* Başlık açma formunu kutu gibi yapmak için */
 .create-topic-form {
-  background-color: #bda8d7 !important;
+  background-color: #f4ebff !important;
   border: 1px solid #dee2e6;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
