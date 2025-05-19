@@ -62,25 +62,9 @@
                     {% endif %}
                 </div>
                 <!--forumda yorum-->
-                <!-- Forumda Paylaş Linki -->
-                {% if existing_ids %}<!--session doluysa peşine ekle-->
-                    {% with existing_ids|join:"&product_id=" as query_string %}
-                        <!-- Link: /forum/?product_id=...&product_id=... -->
-                        <a href="{% url 'add_product_to_session' product.id %}" class="btn btn-primary">
-                    Forumda Paylaş
-                </a>
-
-                    {% endwith %}
-                {% else %}
-                    <!-- Eğer session boşsa, sadece o ürünün ID'sini ekle -->
-                    <a href="{% url 'forum_page' %}?product_id={{ product.id }}">
-                        Forumda Paylaş
-                    </a>
-                {% endif %}
-
-
-
-
+<a href="{% url 'add_product_to_session' product.id %}?next={% url 'forum_page' %}" class="btn btn-primary">
+    Forumda Paylaş
+</a>
 
 
                 <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark w-100 mb-3">Sepete Ekle</a>

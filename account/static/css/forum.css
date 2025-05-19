@@ -1,5 +1,5 @@
 body{
-  background-color: #ebe0ff !important;
+  background-color: #fffef7 !important;
 }
 .search-bar {
   position: relative;
@@ -68,8 +68,8 @@ body{
 
   /* Sağ taraf başlıkları kart gibi */
   .sidebar-section {
-    color: #ffffff;
-    background: #48385b;
+    color: #0e0e0e;
+    background: #8ea3b8;
     border: 1px solid #a092b1;
     border-radius: 8px;
     padding: 15px;
@@ -83,10 +83,10 @@ body{
     margin-bottom: 15px;
   }
   .forum-container{
-    background-color: #ffe8ef;
+    background-color: #e9eff5;
     margin: 100px;
     margin-top: 320px;
-    border: 1px solid #bda8d7;
+    border: 1px solid #fff0f0;
     border-radius:8px;
     padding: 10px;
   }
@@ -184,7 +184,8 @@ body{
 }
 
 .list-group-item:hover {
-  background-color: #33337d; /* lavanta rengi hover */
+   
+  background-color:#8bbeda; ; /* lavanta rengi hover */
 }
 
 /* Başlık (h5) */
