@@ -161,10 +161,6 @@ def product_info(request, product_id):
     # Session üzerinden seçilen ürün ID'lerini al (eğer session'da yoksa boş liste kullan)
     selected_ids = request.session.get('selected_product_ids', [])
     
-    # Eğer bu ürün session'da yoksa ekle (session'da sayıları string olarak saklayabilirsin)
-    if str(product_id) not in selected_ids:
-        selected_ids.append(str(product_id))
-        request.session['selected_product_ids'] = selected_ids
 
     # Yorum yapabilmek için kullanıcı doğrulaması ve ürünü satın almış olma kontrolü
     if request.user.is_authenticated:
@@ -208,17 +204,7 @@ def forum_page(request):# bu fonksiyon baya değişti
     query = request.GET.get('q')
     products = Product.objects.all() 
     
-    #  1. GET ile gelen product_id'leri session'a ekle
-    if request.method == "GET":
-        product_ids_from_url = request.GET.getlist("product_id")
-        existing_ids = request.session.get("selected_product_ids", [])
-        
-        for pid in product_ids_from_url:
-            if pid not in existing_ids:
-                existing_ids.append(pid)
-
-        request.session["selected_product_ids"] = existing_ids
-     # Session'dan seçili ürün ID'lerini al
+   
     preselected_ids = request.session.get('selected_product_ids', [])
     selected_products = Product.objects.filter(id__in=preselected_ids)
 
@@ -283,7 +269,7 @@ def forum_page(request):# bu fonksiyon baya değişti
             for r in related:
                 r.related_threads.add(thread)
                  # Forum başlığı oluşturulduktan sonra session’daki seçili ürünleri temizle
-            request.session['selected_products_ids'] = []
+            request.session['selected_product_ids'] = []
 
             messages.success(request, "Başlık başarıyla oluşturuldu!")
 
@@ -558,12 +544,18 @@ def urun_ara(request):# ürün adını arayarak listeliyor ve seçtiriyo ona gr�
 def clear_selected_products(request):# birden fazzla ürün eklenince seçimleri kaldırmaya yarayan kısım
     request.session['selected_product_ids'] = []
     return JsonResponse({'status': 'ok'})
-def add_product_to_session(request, product_id):# üürnleri ssesssiona ekleyerek birden fazla ürün eklenmes,ni sağlayan ksım 
-    selected_ids = request.session.get("selected_product_ids", [])
-    if product_id not in selected_ids:
-        selected_ids.append(product_id)
-        request.session["selected_product_ids"] = selected_ids
-        messages.success(request, "Ürün başarıyla eklendi.")
-    else:
-        messages.info(request, "Ürün zaten seçilmişti.")
-    return redirect('forum_page')
+
+def add_product_to_session(request, product_id):
+    # Eğer kullanıcı giriş yapmamışsa giriş sayfasına yönlendir
+    if not request.user.is_authenticated:
+        messages.warning(request, "Ürün seçebilmek için giriş yapmalısınız.")
+        return redirect('/login/?next=' + request.get_full_path())
+
+    selected = request.session.get("selected_product_ids", [])
+    if str(product_id) not in selected:
+        selected.append(str(product_id))
+        request.session["selected_product_ids"] = selected
+        request.session.modified = True
+
+    next_url = request.GET.get("next", "/forum/")
+    return redirect(next_url)
