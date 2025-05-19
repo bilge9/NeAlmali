@@ -119,6 +119,7 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
+TIME_ZONE = 'Europe/Istanbul'
 USE_TZ = True
 
 

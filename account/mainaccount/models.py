@@ -13,6 +13,28 @@ class SellerProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.store_name}"
+    
+class UserProfile(models.Model):
+    AVATAR_CHOICES = [
+        ('avatar1.jpeg', 'Avatar 1'),
+        ('avatar2.jpeg', 'Avatar 2'),
+        ('avatar3.jpeg', 'Avatar 3'),
+        ('avatar4.jpeg', 'Avatar 4'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    nickname = models.CharField(max_length=50, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True)
+    avatar = models.CharField(max_length=100, choices=AVATAR_CHOICES, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} Profili"
+
+    def avatar_url(self):
+        if self.avatar:
+            return f"/static/avatars/{self.avatar}"
+        return "/static/avatars/default.png"
 
 class Category(MPTTModel):
     name = models.CharField(max_length=100)
@@ -177,3 +199,30 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.name}"
+    
+# Alışveriş geçmişi
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Beklemede'),
+        ('completed', 'Tamamlandı'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    address = models.CharField(max_length=255, default='Adres girilmedi')
+    phone = models.CharField(max_length=20, default='Telefon girilmedi')
+    note = models.TextField(blank=True, default='')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_status_display()} - {self.created_at.strftime('%Y-%m-%d')}"
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    price_at_order_time = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def get_total_price(self):
+        return self.quantity * self.price_at_order_time

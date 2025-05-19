@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% load static %}
+{% load image_filters %}
+
+{% block title %}Profilim{% endblock %}
+    
+{% block link %}
+    <link rel="stylesheet" href={% static 'css/user_profile.css'%}>
+{% endblock %}    
+  
+{% block message %}
+    {% include 'message_box.html' %}
+{% endblock message %}
+
+{% block content %}
+<div class="page-container">
+
+  <aside class="sidebar" style="text-align:center;">
+    <!-- Avatar Fotoğrafı -->
+    {% if profile.avatar %}
+      <img src="{% static 'avatars/'|add:profile.avatar %}" alt="Avatar" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom: 10px;">
+    {% else %}
+      <img src="{% static 'avatars/default_avatar.jpeg' %}" alt="Avatar" style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom: 10px;">
+    {% endif %}
+
+    <h2>Kullanıcı Bilgileri</h2>
+    <p><strong>Ad Soyad:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Takma Ad:</strong> {{ profile.nickname }}</p>
+    <p><strong>Telefon:</strong> {{ profile.phone }}</p>
+    <p><strong>Adres:</strong> {{ profile.address }}</p>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+      Profili Düzenle
+    </button>
+    <button type="button" class="btn btn-outline-secondary mt-2" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+      Şifreyi Değiştir
+    </button>
+  </aside>
+  
+
+
+  <main class="main-content">
+    <nav class="menu">
+      <button class="menu-item active" data-target="orders">Tamamlanan Siparişler</button>
+      <button class="menu-item" data-target="cart">Bekleyen Siparişler</button>
+      <button class="menu-item" data-target="reviews">Yorumlar</button>
+      <button class="menu-item" data-target="threads">Forum Başlıkları</button>
+    </nav>
+
+    <section id="orders" class="content active">
+      {% for order in completed_orders %}
+        <div class="order-box">
+          <div class="order-meta">
+            <p><strong>Sipariş Tarihi:</strong> {{ order.created_at|date:"d M Y H:i" }}</p>
+            <p><strong>Sipariş No:</strong> #{{ order.id }}</p>
+          </div>
+
+          <div class="order-items">
+            {% for item in order.items.all %}
+              <div class="order-item">
+                <div class="order-image">
+                  {% with item.product.images|get_main_image as main_image %}
+                    {% if main_image %}
+                      <a href="{% url 'product_info' item.product.id %}">
+                        <img src="{{ main_image.image.url }}" alt="{{ item.product.name }}">
+                      </a>
+                    {% else %}
+                      <div style="width: 80px; height: 80px; background: #ccc; border-radius: 8px;"></div>
+                    {% endif %}
+                  {% endwith %}
+                </div>
+                <div class="product-details">
+                  <p class="product-name">{{ item.product.name }}</p>
+                  <p class="product-qty">{{ item.quantity }} adet</p>
+                </div>
+                <div class="meta">
+                  <p>{{ item.get_total_price }} TL</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% empty %}
+        <p>Henüz tamamlanan siparişiniz yok.</p>
+      {% endfor %}
+    </section>
+
+    <section id="cart" class="content">
+      {% for entry in pending_order_items %}
+        {% with item=entry.item duration=entry.duration %}
+          <div class="cart-box">
+            <div class="cart-image">
+              {% with item.product.images|get_main_image as main_image %}
+                {% if main_image %}
+                  <a href="{% url 'product_info' item.product.id %}">
+                    <img src="{{ main_image.image.url }}" alt="{{ item.product.name }}">
+                  </a>  
+                {% else %}
+                  <div style="width: 80px; height: 80px; background: #ccc; border-radius: 8px;"></div>
+                {% endif %}
+              {% endwith %}
+            </div>
+            <div class="product-details">
+              <p class="product-name">{{ item.product.name }}</p>
+              <p class="product-qty">{{ item.quantity }} adet</p>
+              
+            </div>
+            <div class="meta">
+              <p>Beklemede: {{ duration }}</p>
+              <p>{{ item.get_total_price }} TL</p>
+            </div>
+          </div>
+        {% endwith %}
+      {% empty %}
+        <p>Beklemede sipariş yok.</p>
+      {% endfor %}
+    </section>
+
+    <section id="reviews" class="content">
+      {% for review in reviews %}
+        <div class="review-box">
+          <div>
+            <a href="{% url 'product_info' review.product.id %}" style="color: #4a63d0; text-decoration: none;">
+          {{ review.product.name }}
+        </a>
+            <p>{{ review.comment }}</p>
+          </div>
+        </div>
+      {% empty %}
+        <p>Henüz yorum yapmadınız.</p>
+      {% endfor %}
+    </section>
+
+    <section id="threads" class="content">
+      {% for thread in threads %}
+        <div class="thread-box">
+          <a href="{% url 'thread_detail' thread.id %}" style="color: #4a63d0; text-decoration: none;">
+          {{ thread.title }}
+        </a>
+          <span>{{ thread.created_at|date:"d M Y" }}</span>
+        </div>
+      {% empty %}
+        <p>Forumda başlık açmamışsınız.</p>
+      {% endfor %}
+    </section>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'user_profile' %}">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProfileModalLabel">Profili Düzenle</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="first_name" class="form-label">Ad</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+          </div>
+          <div class="mb-3">
+            <label for="last_name" class="form-label">Soyad</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">E-posta</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+          </div>
+          <div class="mb-3">
+            <label for="nickname" class="form-label">Takma Ad</label>
+            <input type="text" class="form-control" id="nickname" name="nickname" value="{{ profile.nickname }}">
+          </div>
+          <div class="mb-3">
+            <label for="phone" class="form-label">Telefon</label>
+            <input type="text" class="form-control" id="phone" name="phone" value="{{ profile.phone }}">
+          </div>
+          <div class="mb-3">
+            <label for="address" class="form-label">Adres</label>
+            <textarea class="form-control" id="address" name="address">{{ profile.address }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Avatar Seç</label>
+            <div class="d-flex flex-wrap gap-3">
+              {% for filename, label in profile.AVATAR_CHOICES %}
+                <label class="avatar-option" style="cursor: pointer;">
+                  <input type="radio" name="avatar" value="{{ filename }}" class="d-none"
+                        {% if profile.avatar == filename %}checked{% endif %}>
+                  <img src="{% static 'avatars/'|add:filename %}" 
+                      alt="{{ label }}"
+                      class="avatar-img border rounded {% if profile.avatar == filename %}selected{% endif %}"
+                      width="80" height="80">
+                  <div class="text-center mt-1 small">{{ label }}</div>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-primary">Kaydet</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Şifre Değiştir Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{% url 'user_profile' %}">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="changePasswordModalLabel">Şifreyi Değiştir</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">  
+          <div class="mb-3">
+            <label for="old_password" class="form-label">Eski Şifre</label>
+            <input type="password" class="form-control" id="old_password" name="old_password" required>
+          </div>
+          <div class="mb-3">
+            <label for="new_password1" class="form-label">Yeni Şifre</label>
+            <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+          </div>
+          <div class="mb-3">
+            <label for="new_password2" class="form-label">Yeni Şifre (Tekrar)</label>
+            <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-primary">Değiştir</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock  %}  
+
+{% block script %}
+  <script src={% static 'js/user_profile.js' %}></script>
+{% endblock  %}

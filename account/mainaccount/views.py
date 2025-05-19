@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Attribute, ProductAttributeValue, ProductImage, SellerProfile,  Category, ForumCategory, Thread, Reply, ThreadVote, Cart, CartItem, Favorite
+from .models import Product, Attribute, ProductAttributeValue, ProductImage, SellerProfile,  Category, ForumCategory, Thread, Reply, ThreadVote, Cart, CartItem, Favorite, UserProfile, Order, OrderItem, ProductReview
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
 from .forms import ProductReviewForm, ProductForm
@@ -14,6 +14,9 @@ from django.core.paginator import Paginator
 import re
 from django.db.models import Q
 from django.urls import reverse
+from datetime import datetime, timezone
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 def index(request):
     return render(request, 'index.html')
@@ -47,6 +50,9 @@ def register(request):
             first_name=first_name,
             last_name=last_name
         )
+
+        # Kullanıcı profili oluştur
+        UserProfile.objects.create(user=user)
         
         # ✅ Satıcı ise SellerProfile oluştur
         if is_seller:
@@ -59,7 +65,7 @@ def register(request):
 
         login(request, user)
         messages.success(request, 'Başarıyla kaydoldunuz.')
-        return redirect(next_page)
+        return redirect(index)
 
     return render(request, 'register.html')
 
@@ -161,6 +167,10 @@ def product_info(request, product_id):
     # Session üzerinden seçilen ürün ID'lerini al (eğer session'da yoksa boş liste kullan)
     selected_ids = request.session.get('selected_product_ids', [])
     
+    # Eğer bu ürün session'da yoksa ekle (session'da sayıları string olarak saklayabilirsin)
+    if str(product_id) not in selected_ids:
+        selected_ids.append(str(product_id))
+        request.session['selected_product_ids'] = selected_ids
 
     # Yorum yapabilmek için kullanıcı doğrulaması ve ürünü satın almış olma kontrolü
     if request.user.is_authenticated:
@@ -526,6 +536,127 @@ def seller_profile(request):
         'products': products,
         'profile': profile,
     })
+
+@login_required
+def user_profile(request):
+    user = request.user
+    profile, created = UserProfile.objects.get_or_create(user=user)
+
+    # Profil güncelleme formu gönderildiyse
+    if request.method == 'POST':
+         # Şifre değişikliği formu doluysa
+        if 'old_password' in request.POST and 'new_password1' in request.POST:
+            password_form = PasswordChangeForm(user=request.user, data=request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Kullanıcının oturumu açık kalsın
+                messages.success(request, "Şifre başarıyla değiştirildi.")
+                return redirect('user_profile')
+            else:
+                messages.error(request, "Şifre değiştirme başarısız. Lütfen bilgileri kontrol edin. Olası hatalar: Eski şifre yanlış, yeni şifreler eşleşmiyor, yeni şifre yeterince güçlü değil vb.")
+                
+        else:
+            # User modeli bilgileri
+            user.first_name = request.POST.get('first_name', '')
+            user.last_name = request.POST.get('last_name', '')
+            user.email = request.POST.get('email', '')
+            user.username = request.POST.get('email', '')
+            user.save()
+
+            # UserProfile bilgileri
+            profile.nickname = request.POST.get('nickname', '')
+            profile.phone = request.POST.get('phone', '')
+            profile.address = request.POST.get('address', '')
+            profile.avatar = request.POST.get('avatar', '')
+            profile.save()
+
+            messages.success(request, "Profiliniz başarıyla güncellendi.")
+
+            return redirect('user_profile')  # Formdan sonra sayfayı yenile
+
+    password_form = PasswordChangeForm(user=request.user)
+
+    # Siparişler (tamamlananlar)
+    completed_orders = Order.objects.filter(user=user, status='completed').order_by('-created_at')
+
+   # Sepettekiler yerine beklemede olan sipariş ürünleri
+    pending_orders = Order.objects.filter(user=user, status='pending').order_by('-created_at')
+
+    now = datetime.now(timezone.utc)
+    pending_order_items = []
+
+    for order in pending_orders:
+        items = order.items.select_related('product')
+        for item in items:
+            delta = now - order.created_at
+            days = delta.days
+            hours = delta.seconds // 3600
+            minutes = (delta.seconds % 3600) // 60
+            duration_str = f"{days} gün {hours} saat {minutes} dakika"
+            
+            # item + bekleme süresini birlikte dict olarak ekle
+            pending_order_items.append({
+                'item': item,
+                'duration': duration_str
+            })
+
+    # Ürün yorumları
+    reviews = ProductReview.objects.filter(user=user).select_related('product')
+
+    # Forum başlıkları
+    threads = Thread.objects.filter(user=user).order_by('-created_at')
+
+    context = {
+        'user': user,
+        'completed_orders': completed_orders,
+        'pending_order_items': pending_order_items,
+        'reviews': reviews,
+        'threads': threads,
+        'profile': profile,  # template içinde formda kullanmak için gerekli
+        'password_form': password_form,
+    }
+
+    return render(request, 'user_profile.html', context)
+
+@login_required
+def complete_order(request):
+    cart = Cart.objects.get(user=request.user)
+    cart_items = cart.items.all()
+
+    if request.method == 'POST':
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        note = request.POST.get('note', '')
+
+        if not address or not phone:
+            messages.error(request, "Adres ve telefon bilgileri zorunludur.")
+            return redirect('cart_detail')
+
+        if not cart_items.exists():
+            messages.warning(request, "Sepetinizde ürün yok.")
+            return redirect('cart_detail')
+
+        order = Order.objects.create(
+            user=request.user,
+            address=address,
+            phone=phone,
+            note=note,
+            status='pending'
+        )
+
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price_at_order_time=item.product.price
+            )
+
+        cart_items.delete()
+        messages.success(request, "Siparişiniz alındı. Onay sürecine geçildi.")
+        return redirect('shopping')
+
+    return redirect('cart_detail')
 
 def urun_ara(request):# ürün adını arayarak listeliyor ve seçtiriyo ona gröe ekleniyor
     q = request.GET.get('q', '')
