@@ -4,10 +4,11 @@ from .models import ProductReview ,Product, UserProfile
 class ProductReviewForm(forms.ModelForm):
     class Meta:
         model = ProductReview
-        fields = ['rating', 'comment']
+        fields = ['rating', 'comment', 'image', 'seller_rating']
         widgets = {
-            'rating': forms.HiddenInput(),  # Gizli input
+            'rating': forms.HiddenInput(),
             'comment': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'seller_rating': forms.Select(attrs={'class': 'form-select'}),
         }
 
 class ProductForm(forms.ModelForm):

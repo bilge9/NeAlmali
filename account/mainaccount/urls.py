@@ -46,6 +46,8 @@ urlpatterns = [
     #profile
     path('seller/profile/', views.seller_profile, name='seller_profile'),
     path('profilim/', views.user_profile, name='user_profile'),
+    path('seller/<int:pk>/', views.seller_profile_detail, name='seller_profile_detail'),
+
 
     path("urun-ara/", views.urun_ara, name="urun_ara"),#bu ürünü adını aratarak bulan url
     path("forum/clear-selected-products/", views.clear_selected_products, name="clear_selected_products"),

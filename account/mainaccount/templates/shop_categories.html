@@ -37,8 +37,12 @@
     <div class="sayfa-wrapper"><!-- filtreleme kısmı ve ürünleri ayırdık sağ sol olacak şekilde-->
 
       <div class="filter-sidebar"><!--filtre kısmı-->
+        
+      <form method="get" class="filter-form">
+
+        <!-- Alt Kategoriler -->
         <div class="filter-box">
-          <h5>Categories</h5>
+          <h5>Alt Kategoriler</h5>
           <ul class="filter-list">
             {% for subcategory in subcategories %}
                 <li>
@@ -51,26 +55,76 @@
               {% endfor %}
           </ul>
         </div>
-        
+
+        <!-- Renk -->
         <div class="filter-box">
-          <h5>Color</h5>
+          <h5>Renk</h5>
           <ul class="filter-list">
-            <li>Gold <span>(1)</span></li>
-            <li>Silver <span>(3)</span></li>
-            <li>Black <span>(5)</span></li>
+            {% for color in all_colors %}
+              <li>
+                <label>
+                  <input type="checkbox" name="color" value="{{ color }}"
+                    {% if color in colors %}checked{% endif %}>
+                  {{ color }}
+                </label>
+              </li>
+            {% empty %}
+              <li>Renk bulunamadı</li>
+            {% endfor %}
           </ul>
         </div>
-        
+
+        <!-- Satıcı -->
         <div class="filter-box">
-          <h5>Filter By Price</h5>
-          <input type="range" min="0" max="1000" value="250" class="price-range">
-          <div class="price-values">
-            Price: $<span id="min-price">0</span> – $<span id="max-price">1000</span>
-          </div>
-          <button class="filter-button">Filter</button>
+          <h5>Satıcı</h5>
+          <ul class="filter-list">
+            {% for seller in sellers %}
+              <li>
+                <label>
+                  <input type="checkbox" name="seller" value="{{ seller }}"
+                    {% if seller in seller_filters %}checked{% endif %}>
+                  {{ seller }}
+                </label>
+              </li>
+            {% empty %}
+              <li>Satıcı bulunamadı</li>
+            {% endfor %}
+          </ul>
         </div>
-       
-      </div>
+
+        <!-- Marka -->
+        <div class="filter-box">
+          <h5>Marka</h5>
+          <ul class="filter-list">
+            {% for brand in brands %}
+              {% if brand %}
+                <li>
+                  <label>
+                    <input type="checkbox" name="brand" value="{{ brand }}"
+                      {% if brand in brand_filters %}checked{% endif %}>
+                    {{ brand }}
+                  </label>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Fiyat Aralığı -->
+        <div class="filter-box">
+          <h5>Fiyat Aralığı</h5>
+          <label>Min:</label>
+          <input type="number" name="min_price" value="{{ min_price }}">
+          <label>Max:</label>
+          <input type="number" name="max_price" value="{{ max_price }}">
+        </div>
+
+        <button type="submit" class="filter-button">Filtrele</button>
+      </form>
+      <!-- ✅ Filtreyi temizleme bağlantısı -->
+      <a href="{% url 'shop_categories' category.id %}" class="clear-filters-button">Seçimi Temizle</a>
+    </div>
+      <!-- Filtreleme kısmı bitiş -->
 
       <div class="products"><!--ürünler kısmı-->
         {% for product in products %}
@@ -118,8 +172,5 @@
 
     </div>
   
-    {% endblock  %}  
+{% endblock  %}  
     
-    {% block script %}
-      
-    {% endblock  %}

@@ -34,7 +34,7 @@
             <div class="col-md-6 text-center">
                 {% with product.images|get_main_image as main_image %}
                 {% if main_image %}
-                    <img id="mainProductImage" src="{{ main_image.image.url }}" class="main-img" alt="Ana Fotoğraf" onclick="openImageModal(this.src)">
+                    <img id="mainProductImage" src="{{ main_image.image.url }}" class="main-img " alt="Ana Fotoğraf" onclick="openImageModal(this.src)">
 
                 {% else %}
                     <img id="mainProductImage" src="{% static 'pictures/imageplaceholder.png' %}" class="main-img" alt="Ana Fotoğraf">
@@ -49,132 +49,222 @@
             </div>
 
             <!-- Ürün Bilgileri -->
-            <div class="col-md-5 product-info">
-                <h2>{{ product.brand }} {{ product.name }}</h2>
-                <h4 class="price">{{ product.price }} TL</h4>
+            <div class="col-md-6 product-info">
+            <h2 class="mb-2">{{ product.brand }} - {{ product.name }}</h2>
+            <h4 class="price mb-3">{{ product.price }} TL</h4>
 
-                <div class="rating">
-                    {% if product.average_rating %}
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <span class="text-muted">({{ product.average_rating|floatformat:1 }})</span>
-                    {% else %}
-                        <span class="text-muted">Yorum yok</span>
-                    {% endif %}
+            <!-- Satıcı Bilgileri -->
+            <div class="seller-info bg-light p-3 rounded mb-3 border">
+                <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">
+                    Satıcı: 
+                    <a href="{% url 'seller_profile_detail' product.seller.id %}" class="seller-link fw-semibold" style="color: #000;">
+                        {{ product.seller.seller_profile.store_name }}
+                    </a>
+                    </h5>
+                    <div class="seller-rating">
+                    {% with product.seller.seller_profile.average_rating as rating %}
+                        {% if rating %}
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= rating %}
+                            <i class="bi bi-star-fill text-warning"></i>
+                            {% elif forloop.counter0 < rating %}
+                            <i class="bi bi-star-half text-warning"></i>
+                            {% else %}
+                            <i class="bi bi-star text-warning"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="text-muted">({{ rating }})</span>
+                        {% else %}
+                        <span class="text-muted">Puan yok</span>
+                        {% endif %}
+                    {% endwith %}
+                    </div>
                 </div>
-                <!--forumda yorum-->
-                <a href="{% url 'add_product_to_session' product.id %}?next={% url 'forum_page' %}" class="btn btn-primary w-100 mb-3">
+                <a href="{% url 'seller_profile_detail' product.seller.id %}" class="btn btn-secondary btn-sm">
+                    Satıcı Profili
+                </a>
+                </div>
+            </div>
+
+            <!-- Ürün Puanı -->
+            <div class="rating mb-3">
+                <h5 class="mb-1">Ürün Puanı:</h5>
+                {% with product.average_rating as rating %}
+                {% if rating %}
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= rating %}
+                        <i class="bi bi-star-fill text-warning"></i>
+                    {% elif forloop.counter0 < rating %}
+                        <i class="bi bi-star-half text-warning"></i>
+                    {% else %}
+                        <i class="bi bi-star text-warning"></i>
+                    {% endif %}
+                    {% endfor %}
+                    <span class="text-muted">({{ rating|floatformat:1 }})</span>
+                {% else %}
+                    <span class="text-muted">Yorum yok</span>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Forumda Paylaş -->
+            <div class="mb-3">
+                {% if existing_ids %}
+                {% with existing_ids|join:"&product_id=" as query_string %}
+                    <a href="{% url 'add_product_to_session' product.id %}" class="btn btn-primary w-100">
+                    Forumda Paylaş
+                    </a>
+                {% endwith %}
+                {% else %}
+                <a href="{% url 'forum_page' %}?product_id={{ product.id }}" class="btn btn-primary w-100">
                     Forumda Paylaş
                 </a>
-
-
-                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark w-100 mb-3">Sepete Ekle</a>
-
-                {% if user.is_authenticated %}
-                    {% if is_favorited %}
-                        <a href="{% url 'remove_from_favorites' product.id %}" class="btn btn-danger w-100 mb-3">
-                            <i class="bi bi-heart-fill"></i> Favorilerde
-                        </a>
-                    {% else %}
-                        <a href="{% url 'add_to_favorites' product.id %}" class="btn btn-danger w-100 mb-3">
-                            <i class="bi bi-heart"></i> Favorilere Ekle
-                        </a>
-                    {% endif %}
-                {% else %}
-                    <a href="{% url 'login_view' %}" class="btn btn-secondary w-100 mb-3">
-                        <i class="bi bi-heart"></i> Giriş yaparak favorilere ekle
-                    </a>
                 {% endif %}
+            </div>
 
+            <!-- Sepete Ekle -->
+            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark w-100 mb-3">
+                Sepete Ekle
+            </a>
 
-                <h5>Açıklama</h5>
-                <p>{{ product.description }}</p>
+            <!-- Favorilere Ekle -->
+            {% if user.is_authenticated %}
+                {% if is_favorited %}
+                <a href="{% url 'remove_from_favorites' product.id %}" class="btn btn-danger w-100 mb-3">
+                    <i class="bi bi-heart-fill"></i> Favorilerde
+                </a>
+                {% else %}
+                <a href="{% url 'add_to_favorites' product.id %}" class="btn btn-danger w-100 mb-3">
+                    <i class="bi bi-heart"></i> Favorilere Ekle
+                </a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login_view' %}" class="btn btn-secondary w-100 mb-3">
+                <i class="bi bi-heart"></i> Giriş yaparak favorilere ekle
+                </a>
+            {% endif %}
 
-                <ul class="list-unstyled">
-                    {% for attr in product.attribute_values.all %}
-                        <li><strong>{{ attr.attribute.name }}:</strong> {{ attr.value }}</li>
-                    {% endfor %}
-                </ul>
+            <!-- Açıklama -->
+            <h5 class="mt-4">Açıklama</h5>
+            <p class="ps-2">{{ product.description }}</p>
+
+            <!-- Özellikler -->
+            <ul class="list-unstyled ps-3">
+                {% for attr in product.attribute_values.all %}
+                <li><strong>{{ attr.attribute.name }}:</strong> {{ attr.value }}</li>
+                {% endfor %}
+            </ul>
             </div>
         </div>
     </div>
 
     <!-- Yorumlar -->
     <div class="reviews container mt-5">
-        <h4>Yorumlar</h4>
-        <div class="review-slider d-flex overflow-auto gap-3 py-3">
+    <h4>Yorumlar</h4>
+    <div class="review-slider d-flex overflow-auto gap-3 py-3">
+        {% for review in reviews %}
+        <div class="review-box border rounded p-3" style="min-width: 250px; max-width: 300px;">
+            <strong>{{ review.user.username }}</strong>
 
-            {% for review in reviews %}
-            <div class="review-box border rounded p-3" style="min-width: 250px; max-width: 300px;">
-                <strong>{{ review.user.username }}</strong>
-                <div class="text-warning mb-1">
-                    {% for i in "12345" %}
-                        {% if forloop.counter <= review.rating %}
-                            <i class="bi bi-star-fill"></i>
-                        {% else %}
-                            <i class="bi bi-star"></i>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-
-                <p class="comment-text">{{ review.comment }}</p>
-                {% if review.comment|length > 200 %}
-                    <button class="read-more-btn btn btn-link p-0">Devamını Oku</button>
+            <!-- Ürün Değerlendirmesi -->
+            <div class="text-warning mb-1">
+            {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}
+                <i class="bi bi-star-fill"></i>
+                {% else %}
+                <i class="bi bi-star"></i>
                 {% endif %}
-
-                <small class="text-muted d-block mt-2">{{ review.created_at|date:"d M Y" }}</small>
-            </div>
-            {% empty %}
-                <p>Henüz yorum yapılmamış.</p>
             {% endfor %}
-        </div>
+            </div>
 
-        {% if user.is_authenticated %}
-            {% if has_reviewed %}
-                <div class="alert alert-dark mt-3">Bu ürüne zaten yorum yaptınız.</div>
-            {% else %}
-                <button class="btn btn-dark mt-3" onclick="openCommentForm()">Yorum Yap</button>
+            <!-- Yorum Metni -->
+            <p class="comment-text">{{ review.comment }}</p>
+            {% if review.comment|length > 200 %}
+            <button class="read-more-btn btn btn-link p-0">Devamını Oku</button>
             {% endif %}
-        {% else %}
-            <p class="alert alert-dark mt-3">Yorum yazmak için <a href="{% url 'login_view' %}">giriş yapın</a>.</p>
-        {% endif %}
+
+            <!-- Fotoğraf varsa göster -->
+            {% if review.image %}
+            <div class="mt-2">
+                <img src="{{ review.image.url }}" alt="Yorum Fotoğrafı" class="img-fluid rounded" style="max-height: 150px;">
+            </div>
+            {% endif %}
+
+            <small class="text-muted d-block mt-2">{{ review.created_at|date:"d M Y H:i" }}</small>
+        </div>
+        {% empty %}
+        <p>Henüz yorum yapılmamış.</p>
+        {% endfor %}
     </div>
+
+    {% if user.is_authenticated %}
+        {% if has_reviewed %}
+        <div class="alert alert-dark mt-3">Bu ürüne zaten yorum yaptınız.</div>
+        {% else %}
+        <button class="btn btn-dark mt-3" onclick="openCommentForm()">Yorum Yap</button>
+        {% endif %}
+    {% else %}
+        <p class="alert alert-dark mt-3">Yorum yazmak için <a href="{% url 'login_view' %}">giriş yapın</a>.</p>
+    {% endif %}
+    </div>
+
 
 
     <!-- Yorum Formu (Açılır Pencere) -->
     <div class="backdrop" id="backdrop" onclick="closeCommentForm()"></div>
     <div class="comment-form-popup" id="commentForm">
-        {% if user.is_authenticated %}
-            {% if has_reviewed %}
-                <p class="text-muted">Bu ürüne zaten yorum yaptınız.</p>
-            {% elif user_purchased %}
-                <h5>Yorum Yaz</h5>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label>Derecelendirme:</label>
-                        <div class="star-rating">
-                        <input type="hidden" name="rating" id="ratingInput" value="0">
-                        <span class="star" data-value="1">&#9733;</span>
-                        <span class="star" data-value="2">&#9733;</span>
-                        <span class="star" data-value="3">&#9733;</span>
-                        <span class="star" data-value="4">&#9733;</span>
-                        <span class="star" data-value="5">&#9733;</span>
-                        </div>
-                    </div>
+    {% if user.is_authenticated %}
+    {% if has_reviewed %}
+        <p class="text-muted">Bu ürüne zaten yorum yaptınız.</p>
+    {% elif user_purchased %}
+        <h5>Yorum Yaz</h5>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label>Derecelendirme:</label>
+                <div class="star-rating">
+                    <input type="hidden" name="rating" id="ratingInput" value="0">
+                    <span class="star" data-value="1">&#9733;</span>
+                    <span class="star" data-value="2">&#9733;</span>
+                    <span class="star" data-value="3">&#9733;</span>
+                    <span class="star" data-value="4">&#9733;</span>
+                    <span class="star" data-value="5">&#9733;</span>
+                </div>
+            </div>
 
-                    <div class="mb-3">
-                        {{ form.comment.label_tag }} {{ form.comment }}
-                    </div>
+            <div class="mb-3">
+                {{ form.comment.label_tag }}
+                {{ form.comment }}
+            </div>
 
-                    <button type="submit" class="btn btn-primary">Gönder</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeCommentForm()">İptal</button>
-                </form>
-            {% else %}
-                <p class="text-muted">Yorum yazabilmeniz için ürünü satın almış olmanız gerekir.</p>
-            {% endif %}
-        {% else %}
-            <p>Lütfen <a href="{% url 'login_view' %}">giriş yapın</a> yorum yazmak için.</p>
-        {% endif %}
+            <!-- Fotoğraf ekleme alanı -->
+            <div class="mb-3">
+                <label for="image">Fotoğraf Yükle (isteğe bağlı):</label>
+                <input type="file" name="image" accept="image/*" class="form-control">
+            </div>
+
+            <!-- Satıcı değerlendirme -->
+            <div class="mb-3">
+                <label for="seller_rating">Satıcı Puanı:</label>
+                <select name="seller_rating" class="form-select">
+                    <option value="">Seçiniz</option>
+                    {% for i in "12345" %}
+                        <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Gönder</button>
+            <button type="button" class="btn btn-secondary" onclick="closeCommentForm()">İptal</button>
+        </form>
+    {% else %}
+        <p class="text-muted">Yorum yazabilmeniz için ürünü satın almış olmanız gerekir.</p>
+    {% endif %}
+    {% else %}
+    <p>Lütfen <a href="{% url 'login_view' %}">giriş yapın</a> yorum yazmak için.</p>
+    {% endif %}
     </div>
 
     <!-- Görsel Modal -->

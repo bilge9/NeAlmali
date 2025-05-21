@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load image_filters %}
+
+{% block title %}NeAlmalı - Satıcı Profili{% endblock %}
+
+{% block link %}
+<link rel="stylesheet" href="{% static 'css/seller_profile_detail.css' %}">
+{% endblock %}
+
+{% block message %}
+    {% include "message_box.html" %}
+{% endblock message %}
+
+{%block search-bar%}
+<!-- Arama çubuğu -->
+ <form method="get" action="{% url 'shop_categories' category_id=1 %}">
+  <div class="search-bar">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Ürün ara..." value="{{ query }}">
+      <button class="input-group-text" type="submit">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </div>
+</form>
+{%endblock search-bar%}
+
+
+{% block content %}
+
+
+<div class="container mt-5">
+  <div class="row">
+    <!-- Satıcı Bilgileri -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm p-4 text-center rounded-4">
+        <h4 class="mb-1">{{ profile.store_name }}</h4>
+        <small class="text-muted">@{{ seller_user.username }}</small>
+        <hr>
+        <div class="mb-2">
+          <strong>Puan:</strong>
+          <div>
+            {% if profile.average_rating %}
+              {% for i in "12345" %}
+                {% if forloop.counter <= profile.average_rating %}
+                  <i class="bi bi-star-fill text-warning"></i>
+                {% elif forloop.counter0 < profile.average_rating %}
+                  <i class="bi bi-star-half text-warning"></i>
+                {% else %}
+                  <i class="bi bi-star text-warning"></i>
+                {% endif %}
+              {% endfor %}
+              <span class="text-muted">({{ profile.average_rating|floatformat:1 }})</span>
+            {% else %}
+              <span class="text-muted">Puan yok</span>
+            {% endif %}
+          </div>
+        </div>
+        <p class="mt-3">
+          <i class="bi bi-box-seam"></i> Toplam Ürün: {{ products.count }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Satıcının Ürünleri -->
+    <div class="col-md-8">
+      <h4 class="mb-4">Satıcının Ürünleri</h4>
+      <div class="row">
+        {% for product in products %}
+        <div class="col-md-6 col-lg-4 d-flex">
+          <div class="product-wrap">
+            <a href="{% url 'product_info' product.id %}">
+              <div class="product-card">
+                <div class="image-container">
+                  {% with main_image=product.images.all|get_main_image hover_image=product.images.all|get_hover_image %}
+                    {% if main_image %}
+                      <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="main-img">
+                    {% else %}
+                      <img src="{% static 'pictures/imageplaceholder.png' %}" alt="{{ product.name }}" class="main-img">
+                    {% endif %}
+
+                    {% if hover_image %}
+                      <img src="{{ hover_image.image.url }}" alt="{{ product.name }} Hover" class="hover-img">
+                    {% else %}
+                      <img src="{% static 'pictures/imageplaceholder2.png' %}" alt="{{ product.name }} Hover" class="hover-img">
+                    {% endif %}
+                  {% endwith %}
+                </div>
+                <div class="product-info">
+                  <div class="rating">
+                    {% if product.average_rating %}
+                      <i class="bi bi-star-fill"></i>
+                      <span class="text-muted">({{ product.average_rating|floatformat:1 }})</span>
+                    {% else %}
+                      <span class="text-muted">Yorum yok</span>
+                    {% endif %}
+                  </div>
+                  <h6 class="urun-baslik">{{ product.name }}</h6>
+                  <div class="urun-fiyat">${{ product.price }}</div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if not products %}
+        <div class="no-products mt-3">
+          <p>Bu mağazaya ait ürün bulunmamaktadır.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

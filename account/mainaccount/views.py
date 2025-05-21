@@ -109,36 +109,62 @@ def shopping(request):
 
 def shop_categories(request, category_id):
     category = get_object_or_404(Category, id=category_id)
-
-    # Seçilen kategori ve alt kategorilerini al
     categories = category.get_descendants(include_self=True)
 
-    # Arama sorgusunu al
     query = request.GET.get('q')
+    products = Product.objects.filter(category__in=categories).prefetch_related('images', 'attribute_values__attribute', 'seller').distinct()
 
-    # Arama varsa filtrele
     if query:
-        # İlk olarak Product modelindeki doğrudan alanlarda arama
         base_filter = Q(name__icontains=query) | Q(description__icontains=query) | Q(brand__icontains=query) | Q(category__name__icontains=query)
+        attr_matches = ProductAttributeValue.objects.filter(value__icontains=query).values_list('product_id', flat=True)
+        products = products.filter(base_filter | Q(id__in=attr_matches)).distinct()
 
-        # Ardından ilgili attribute_value tablosunda arama yapalım
-        product_ids_from_attributes = ProductAttributeValue.objects.filter(
-            value__icontains=query
-        ).values_list('product_id', flat=True)
+    subcategory_ids = request.GET.getlist('subcategory')
+    brand_filters = request.GET.getlist('brand')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    colors = request.GET.getlist('color')
+    seller_filters = request.GET.getlist('seller')
 
-        # Tüm ürünleri birleştirelim (doğrudan eşleşen + attribute ile eşleşen)
-        products = Product.objects.filter(
-            Q(category__in=categories) & (base_filter | Q(id__in=product_ids_from_attributes))
-        ).prefetch_related('images', 'attribute_values__attribute').distinct()
-    else:
-        products = Product.objects.filter(
-            category__in=categories
-        ).prefetch_related('images', 'attribute_values__attribute').distinct()
+    seller_filters = request.GET.getlist('seller')
+
+    # Satıcı filtreleme için öncelikle satıcılar
+    sellers = SellerProfile.objects.filter(
+        is_approved=True,
+        user__products__in=products
+    ).values_list('store_name', flat=True).distinct()
+
+    if seller_filters:
+        # Seçilen mağaza isimlerine göre filtrele
+        products = products.filter(seller__seller_profile__store_name__in=seller_filters)
+
+    if subcategory_ids:
+        products = products.filter(category__id__in=subcategory_ids)
+
+    if brand_filters:
+        products = products.filter(brand__in=brand_filters)
+
+    if min_price:
+        products = products.filter(price__gte=min_price)
+
+    if max_price:
+        products = products.filter(price__lte=max_price)
+
+    if colors:
+        products = products.filter(
+            attribute_values__attribute__name="Renk",
+            attribute_values__value__in=colors
+        ).distinct()
+
+    all_colors = ProductAttributeValue.objects.filter(
+        product__in=products,
+        attribute__name="Renk"
+    ).values_list('value', flat=True).distinct()
+
+    brands = products.values_list('brand', flat=True).distinct()
 
     subcategories = category.get_children()
-
     parent_category = category.parent if category.parent else None
-
     all_categories = Category.objects.all()
 
     return render(request, 'shop_categories.html', {
@@ -148,13 +174,25 @@ def shop_categories(request, category_id):
         'categories': categories,
         'parent_category': parent_category,
         'all_categories': all_categories,
-        'query': query,  # Arama kutusunda geri göstermek için
+        'query': query,
+        'subcategory_ids': subcategory_ids,
+        'brand_filters': brand_filters,
+        'min_price': min_price,
+        'max_price': max_price,
+        'colors': colors,
+        'brands': brands,
+        'all_colors': all_colors,
+        'sellers': sellers,
+        'seller_filters': seller_filters,
     })
 
 
 def user_has_purchased(user, product):
-    # Sipariş sistemi varsa buraya kontrol eklenmeli
-    return True  # Şimdilik herkes yorum yapabilir gibi düşünelim
+    return OrderItem.objects.filter(
+        order__user=user,
+        order__status='completed',
+        product=product
+    ).exists()
 
 def product_info(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -923,3 +961,17 @@ def redeem_coupon(user, coupon, cost):
         UserCouponReward.objects.create(user=user, coupon=coupon)
         return True
     return False
+
+
+# Satıcı profili detay sayfası
+def seller_profile_detail(request, pk):
+    seller_user = get_object_or_404(User, pk=pk)
+    profile = get_object_or_404(SellerProfile, user=seller_user)
+    products = Product.objects.filter(seller=seller_user)
+
+    context = {
+        'seller_user': seller_user,
+        'profile': profile,
+        'products': products,
+    }
+    return render(request, 'seller_profile_detail.html', context)

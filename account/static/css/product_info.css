@@ -10,6 +10,7 @@ body {
 .main-img {
   max-width: 100%;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .thumb-img {
@@ -25,6 +26,20 @@ body {
 .thumb-scroll {
   overflow-x: auto;
   white-space: nowrap;
+}
+
+.btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.seller-info a {
+  text-decoration: none;
+  color: #000000;
+  
+}
+
+.btn:hover {
+  transform: scale(1.02);
 }
 
 .product-info h2 {

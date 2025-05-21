@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User 
 from mptt.models import MPTTModel, TreeForeignKey
 from django.db.models import Avg
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 
@@ -13,6 +14,16 @@ class SellerProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.store_name}"
+    
+    @property
+    def average_rating(self):
+        # Bu satıcının ürünleri
+        seller_products = Product.objects.filter(seller=self.user)
+        # Bu ürünlere ait tüm yorumlardan seller_rating değerleri
+        seller_reviews = ProductReview.objects.filter(product__in=seller_products, seller_rating__isnull=False)
+        # Ortalamayı al
+        avg = seller_reviews.aggregate(Avg('seller_rating'))['seller_rating__avg']
+        return round(avg, 1) if avg else None
     
 class UserProfile(models.Model):
     AVATAR_CHOICES = [
@@ -105,6 +116,13 @@ class ProductReview(models.Model):
     rating = models.PositiveIntegerField(default=5)
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # Yeni alanlar:
+    image = models.ImageField(upload_to='review_images/', null=True, blank=True)
+    seller_rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True, blank=True
+    )
 
     class Meta:
         constraints = [
