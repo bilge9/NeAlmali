@@ -46,6 +46,7 @@
       <button class="menu-item" data-target="cart">Bekleyen Siparişler</button>
       <button class="menu-item" data-target="reviews">Yorumlar</button>
       <button class="menu-item" data-target="threads">Forum Başlıkları</button>
+      <button class="menu-item" data-target="coupons">Kuponlar</button>
     </nav>
 
     <section id="orders" class="content active">
@@ -144,6 +145,56 @@
         <p>Forumda başlık açmamışsınız.</p>
       {% endfor %}
     </section>
+    
+    <section id="coupons" class="content">
+  <h3><i class="bi bi-gift" style="color: palevioletred;"></i> Kuponlarınız</h3>
+
+  {% if rewards %}
+    <ul class="coupon-list">
+      {% for reward in rewards %}
+        <li class="coupon-box">
+          <strong>{{ reward.coupon.code }}</strong> – {{ reward.coupon.description }}
+          ({{ reward.rewarded_at|date:"d.m.Y" }})
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Henüz kuponunuz yok.<a href="{% url 'help' %}#puan">Nasıl kupon kazanılır?</a></p>
+  {% endif %}
+
+  <hr>
+
+  <h4><i class="bi bi-ticket-perforated" style="color: rgb(255, 140, 0);"></i> Kupon Mağazası</h4>
+  <p>Toplam Puanınız: <strong>{{ user_points.total_points }}</strong></p>
+
+  {% if error %}
+    <p style="color: red;">{{ error }}</p>
+  {% endif %}
+
+  <ul class="coupon-store">
+    {% for coupon in available_coupons %}
+      <li class="coupon-store-box">
+        <strong>{{ coupon.code }}</strong> – {{ coupon.description }}
+        ({{ coupon.required_points }} puan)
+
+        {% if coupon.id in already_has_ids %}
+          <i class="bi bi-check2" style="color: green;"></i> Zaten Alındı
+        {% elif user_points.total_points >= coupon.required_points %}
+          <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="coupon_id" value="{{ coupon.id }}">
+            <button type="submit">Al</button>
+          </form>
+        {% else %}
+          <i class="bi bi-x-circle" style="color: red;"></i>  Yetersiz Puan
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+
+    
   </main>
 </div>
 

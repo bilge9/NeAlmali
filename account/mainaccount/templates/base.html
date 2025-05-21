@@ -90,20 +90,21 @@
           <div class="footer-sütun">
     
             <div class="sütun">
-              <span class="fs-5">NeAlmalı</span>
+              <a href="{% url 'index' %}"><span class="fs-5">NeAlmalı</span></a>
               <ul class="baslik">
                 <li class="mb-2"><a href="about_us.html">Biz Kimiz</a></li>
-                <li class="mb-2"><a href="shop.html">Alışverişe Başla</a></li>
-                <li class="mb-2"><a href="forum.html">NeAl Forum</a></li>
+                <li class="mb-2"><a href="{% url 'shopping' %}">Alışverişe Başla</a></li>
+                <li class="mb-2"><a href="{% url 'forum_page' %}">NeAl Forum</a></li>
               </ul>
             </div>
     
             <div class="sütun">
-              <span class="fs-5">Yardım</span>
+              <a href="{% url 'help' %}"><span class="fs-5">Yardım</a></span></a>
               <ul class="baslik">
-                <li class="mb-2"><a href="#">Sıkça Sorulan Sorular</a></li>
-                <li class="mb-2"><a href="#">İade Politikası</a></li>
-                <li class="mb-2"><a href="#">Kargo ve Teslimat</a></li>
+                <a href="{% url 'help' %}#sss">Sıkça Sorulan Sorular<li class="mb-2"></li></li></a>
+                <a href="{% url 'help' %}#iade">İade Politikası<li class="mb-2"></li></li></a>
+                <a href="{% url 'help' %}#kargo">Kargo ve Teslimat<li class="mb-2"></li></li></a>
+                
               </ul>
             </div>
     

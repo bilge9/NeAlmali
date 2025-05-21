@@ -132,8 +132,8 @@ class Thread(models.Model):
     like_count = models.IntegerField(default=0)
     dislike_count = models.IntegerField(default=0)
     related_threads = models.ManyToManyField('self', blank=True)
-    products = models.ManyToManyField(Product, blank=True, related_name='threads')# başlıklara eklenen ürünleri tutuyor
-    
+    is_hidden = models.BooleanField(default=False)
+
     def __str__(self):
         return self.title
 
@@ -141,6 +141,7 @@ class Thread(models.Model):
         self.like_count = self.votes.filter(value='like').count()
         self.dislike_count = self.votes.filter(value='dislike').count()
         self.save(update_fields=['like_count', 'dislike_count'])
+
 
 class ThreadVote(models.Model):
     LIKE_CHOICES = [
@@ -151,20 +152,24 @@ class ThreadVote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     thread = models.ForeignKey(Thread, on_delete=models.CASCADE, related_name='votes')  # related_name ekledik
     value = models.CharField(choices=LIKE_CHOICES, max_length=7)
-
+    
     class Meta:
         unique_together = ('user', 'thread')  # Aynı kullanıcı aynı başlığa bir kere oy verebilsin
 
 
+# mainaccount/models.py
 
 class Reply(models.Model):
     thread = models.ForeignKey(Thread, related_name="replies", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=2)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    is_hidden = models.BooleanField(default=False)
+    is_best = models.BooleanField(default=False)
     
     def __str__(self):
         return f"Reply by {self.user.username} on {self.thread.title}"
+
 
 
 #Sepet veritabanı
@@ -226,3 +231,130 @@ class OrderItem(models.Model):
 
     def get_total_price(self):
         return self.quantity * self.price_at_order_time
+
+
+
+class Report(models.Model):
+    REPORT_TYPE_CHOICES = [
+        ('thread', 'Başlık'),
+        ('reply', 'Yorum'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'Beklemede'),
+        ('accepted', 'Kabul Edildi'),
+        ('rejected', 'Reddedildi'),
+    ]
+
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE)
+    report_type = models.CharField(max_length=10, choices=REPORT_TYPE_CHOICES)
+    thread = models.ForeignKey('Thread', on_delete=models.CASCADE, null=True, blank=True)
+    reply = models.ForeignKey('Reply', on_delete=models.CASCADE, null=True, blank=True)
+    reason = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    resolution_detail = models.TextField(blank=True, null=True, help_text="Kararın gerekçesi (isteğe bağlı).")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.report_type} raporu ({self.status})"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Otomatik gizleme/gösterme
+        if self.status == 'accepted':
+            if self.report_type == 'thread' and self.thread:
+                self.thread.is_hidden = True
+                self.thread.save(update_fields=['is_hidden'])
+            elif self.report_type == 'reply' and self.reply:
+                self.reply.is_hidden = True
+                self.reply.save(update_fields=['is_hidden'])
+
+        elif self.status == 'rejected':
+            # Tüm raporlar kontrol edilir — accepted yoksa is_hidden False yapılır
+            if self.report_type == 'thread' and self.thread:
+                if not Report.objects.filter(thread=self.thread, status='accepted').exists():
+                    self.thread.is_hidden = False
+                    self.thread.save(update_fields=['is_hidden'])
+            elif self.report_type == 'reply' and self.reply:
+                if not Report.objects.filter(reply=self.reply, status='accepted').exists():
+                    self.reply.is_hidden = False
+                    self.reply.save(update_fields=['is_hidden'])
+
+
+class Rank(models.Model):
+    name = models.CharField(max_length=50)
+    min_points = models.IntegerField()
+    
+
+    def __str__(self):
+        return f"{self.name} ({self.min_points} puan)"
+
+class Coupon(models.Model):
+    code = models.CharField(max_length=20, unique=True)
+    description = models.TextField(blank=True)
+    discount_amount = models.IntegerField(default=0)
+    required_points = models.IntegerField(default=100)  # EKLENDİ
+    created_at = models.DateTimeField(auto_now_add=True)
+    required_rank = models.ForeignKey(Rank, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f"{self.code} - {self.discount_amount} TL"
+
+class UserCouponReward(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rank = models.ForeignKey('Rank', on_delete=models.CASCADE, null=True, blank=True )
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
+    rewarded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'coupon')  # Her kullanıcıya aynı rütbeden bir kez verilir
+
+    def __str__(self):
+        return f"{self.user.username} - {self.rank.name} kuponu"
+
+
+class UserPoint(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="points")
+    total_points = models.IntegerField(default=0)
+    rank_points = models.IntegerField(default=0)   # Sadece rütbe için kullanılır (kupon harcarken düşmez, şikayetle düşer)
+    rank = models.ForeignKey(Rank, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.total_points} puan - {self.rank.name if self.rank else 'Rütbesiz'}"
+
+    def update_rank(self):
+        new_rank = Rank.objects.filter(min_points__lte=self.rank_points).order_by('-min_points').first()
+        if new_rank and new_rank != self.rank:
+            self.rank = new_rank
+            self.save()
+
+        #Hediye kupon verme (rütbe ile)
+            special_coupons = Coupon.objects.filter(required_rank=new_rank)  # böyle bir alan varsa
+            for coupon in special_coupons:
+                if not UserCouponReward.objects.filter(user=self.user, coupon=coupon).exists():
+                    UserCouponReward.objects.create(
+                        user=self.user,
+                        coupon=coupon,
+                        rank=new_rank  # burası önemli
+                    )
+
+
+
+class PointHistory(models.Model):
+    ACTION_CHOICES = [
+        ('thread_create', 'Başlık Açma'),
+        ('reply_best', 'En İyi Cevap'),
+        ('coupon_redeem', 'Kupon Kullanımı'),
+        # gerekirse daha fazlası eklenir
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="point_histories")
+    action = models.CharField(choices=ACTION_CHOICES, max_length=20)
+    points = models.IntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    related_reply = models.ForeignKey('Reply', null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_action_display()} - {self.points} puan"
+

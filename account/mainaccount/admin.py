@@ -17,6 +17,10 @@ from .models import (
     UserProfile,
     Order,
     OrderItem,
+    Report,
+    Rank,
+    Coupon,
+    
 )
 from django.contrib.auth.models import User
 from mptt.admin import DraggableMPTTAdmin
@@ -84,7 +88,7 @@ class ProductAttributeValueAdmin(admin.ModelAdmin):
 @admin.register(Thread)
 class ThreadAdmin(admin.ModelAdmin):
     list_display = ('title', 'user', 'created_at', 'like_count', 'dislike_count')
-    filter_horizontal = ('categories',)
+    filter_horizontal = ('categories',)  # Categories alanını yan yana görsel olarak seçilebilir kılar
 
 # === ForumCategory Admin ===
 @admin.register(ForumCategory)
@@ -151,3 +155,41 @@ class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'nickname')
     list_filter = ('avatar',)
     ordering = ('user__username',)
+
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ('id', 'thread', 'report_type', 'status', 'reporter', 'reason', 'created_at', 'is_thread_hidden')
+    list_filter = ('report_type', 'status', 'created_at')
+    search_fields = ('reason',)
+    actions = ['mark_reviewed', 'mark_resolved', 'mark_rejected']
+
+    def is_thread_hidden(self, obj):
+        if obj.report_type == 'thread' and obj.thread:
+            return obj.thread.is_hidden
+        return '-'
+    is_thread_hidden.boolean = True
+    is_thread_hidden.short_description = 'Başlık Gizli mi?'
+
+    def mark_resolved(self, request, queryset):
+        for report in queryset:
+            report.status = 'accepted'
+            report.save()
+    mark_resolved.short_description = "Seçilenleri 'Kabul Edildi' olarak işaretle"
+
+    def mark_rejected(self, request, queryset):
+        for report in queryset:
+            report.status = 'rejected'
+            report.save()
+    mark_rejected.short_description = "Seçilenleri 'Reddedildi' olarak işaretle"
+
+
+@admin.register(Rank)
+class RankAdmin(admin.ModelAdmin):
+    list_display = ('name', 'min_points')
+    ordering = ('min_points',)
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ('code', 'description', 'discount_amount', 'required_points', 'created_at')
+    search_fields = ('code', 'description')
+    list_filter = ('required_points', 'created_at')
+    ordering = ('required_points',)

@@ -23,6 +23,13 @@ urlpatterns = [
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),
     path('category/<int:category_id>/threads/', views.category_threads, name='category_threads'),
     path('kategoriler/', views.category_list, name='category_list'),
+    path('sikayet/cevap/<int:reply_id>/', views.report_reply, name='report_reply'),
+    path('reply/<int:reply_id>/best/', views.mark_best_reply, name='mark_best_reply'),
+       # diğer URL'ler
+    path('kuponlarim/', views.my_coupons, name='my_coupons'),
+    path('help/', views.help, name='help'),
+
+
 
     #sepet
     path('cart/', views.cart_detail, name='cart_detail'),

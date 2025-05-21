@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Attribute, ProductAttributeValue, ProductImage, SellerProfile,  Category, ForumCategory, Thread, Reply, ThreadVote, Cart, CartItem, Favorite, UserProfile, Order, OrderItem, ProductReview
+from .models import Product, Attribute, ProductAttributeValue, ProductImage, SellerProfile,  Category, ForumCategory, Thread, Reply, ThreadVote, Report, UserPoint, Coupon, Cart, CartItem, Favorite, UserProfile, Order, OrderItem, ProductReview
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
 from .forms import ProductReviewForm, ProductForm
@@ -167,11 +167,7 @@ def product_info(request, product_id):
     # Session üzerinden seçilen ürün ID'lerini al (eğer session'da yoksa boş liste kullan)
     selected_ids = request.session.get('selected_product_ids', [])
     
-    # Eğer bu ürün session'da yoksa ekle (session'da sayıları string olarak saklayabilirsin)
-    if str(product_id) not in selected_ids:
-        selected_ids.append(str(product_id))
-        request.session['selected_product_ids'] = selected_ids
-
+  
     # Yorum yapabilmek için kullanıcı doğrulaması ve ürünü satın almış olma kontrolü
     if request.user.is_authenticated:
         user_purchased = user_has_purchased(request.user, product)
@@ -207,50 +203,53 @@ def product_info(request, product_id):
         "existing_ids": selected_ids,
         
     })
+from django.core.paginator import Paginator
+from django.contrib import messages
+from django.db.models import Q
 
-# Forum Kısmı
-def forum_page(request):# bu fonksiyon baya değişti
+def forum_page(request):
     categories = ForumCategory.objects.all()
+    products = Product.objects.all()
+
+    # Arama sorgusu
     query = request.GET.get('q')
-    products = Product.objects.all() 
-    
-   
+
+    # Session'dan önceden seçilmiş ürünleri al
     preselected_ids = request.session.get('selected_product_ids', [])
     selected_products = Product.objects.filter(id__in=preselected_ids)
 
+    # Başlangıç thread queryset'i (arama varsa filtrele)
+    thread_list = Thread.objects.filter(is_hidden=False)
     if query:
-        thread_list = Thread.objects.filter(
+        thread_list = thread_list.filter(
             Q(title__icontains=query) |
             Q(content__icontains=query) |
             Q(categories__name__icontains=query) |
             Q(replies__content__icontains=query)
-        ).distinct().order_by('-id')
+        ).distinct()
+
+    # Kategori filtreleme
+    category_filter = request.GET.getlist("category")
+    if category_filter:
+        thread_list = thread_list.filter(categories__id__in=category_filter).distinct()
+
+    # Sıralama
+    sort_by = request.GET.get("sort")
+    if sort_by == "views":
+        thread_list = thread_list.order_by("-views")
+    elif sort_by == "likes":
+        thread_list = thread_list.order_by("-like_count")
+    elif sort_by == "dislikes":
+        thread_list = thread_list.order_by("-dislike_count")
     else:
-        thread_list = Thread.objects.all().order_by('-id')
-    
-    paginator = Paginator(thread_list, 10)  # Sayfa başına 10 başlık
+        thread_list = thread_list.order_by("-id")
+
+    # Sayfalama
+    paginator = Paginator(thread_list, 10)
     page_number = request.GET.get("page")
     threads = paginator.get_page(page_number)
 
-    # Çoklu kategori filtresi
-    category_filter = request.GET.getlist("category")
-    sort_by = request.GET.get("sort")  # Yeni: sıralama parametresi
-
-    threads = Thread.objects.all()
-    if category_filter:
-        threads = threads.filter(categories__id__in=category_filter).distinct()
-
-    # Sıralama işlemi
-    if sort_by == "views":
-        threads = threads.order_by("-views")
-    elif sort_by == "likes":
-        threads = threads.order_by("-like_count")
-    elif sort_by == "dislikes":
-        threads = threads.order_by("-dislike_count")
-    else:
-        threads = threads.order_by("-id")  # Varsayılan: en yeni başlıklar
-    
-   
+    # POST ile başlık oluşturma
     if request.method == "POST":
         if not request.user.is_authenticated:
             return redirect('/giris-yap/?next=' + request.path)
@@ -258,44 +257,46 @@ def forum_page(request):# bu fonksiyon baya değişti
         title = request.POST.get("title")
         content = request.POST.get("content")
         category_ids = request.POST.getlist("categories")
-        product_ids = request.POST.getlist("selected_products")  # checkbox'lardan veya hidden inputlardan
+        product_ids = request.POST.getlist("selected_products")
 
         if title and content and category_ids:
             thread = Thread.objects.create(
                 title=title,
                 content=content,
                 user=request.user,
-                
             )
             thread.categories.set(category_ids)
-             # Seçilen ürünleri bağlayalım
+
+            # Seçilen ürünleri ekle
             if product_ids:
                 thread.products.set(Product.objects.filter(id__in=product_ids))
 
-            thread.save()
-             # İlgili başlıkları bul ve ata
+            # Puan ver
+            add_points(request.user, 'thread_create', 10)
+
+            # İlgili başlıkları ata
             related = find_related_threads(thread)
             thread.related_threads.set(related)
             for r in related:
                 r.related_threads.add(thread)
-                 # Forum başlığı oluşturulduktan sonra session’daki seçili ürünleri temizle
+
+            # Session'daki seçili ürünleri temizle
             request.session['selected_product_ids'] = []
 
             messages.success(request, "Başlık başarıyla oluşturuldu!")
-
             return redirect("forum_page")
-
 
     return render(request, "forum.html", {
         "categories": categories,
         "threads": threads,
         "query": query,
-        "products": products,  # tüm ürünler
-        "selected_products": selected_products,#seçilen ürünleri listeye  atıyo
+        "products": products,
+        "selected_products": selected_products,
         "product_ids": '&'.join([f"product_id={pid}" for pid in preselected_ids]),
         "selected_categories": list(map(int, category_filter)) if category_filter else [],
-        "sort_by": sort_by,  # Şablonda kullanılacak
+        "sort_by": sort_by,
     })
+
 
 def forum_autocomplete(request):
     term = request.GET.get('term', '')
@@ -537,6 +538,10 @@ def seller_profile(request):
         'profile': profile,
     })
 
+def help(request):
+    return render(request, 'help.html')
+
+
 @login_required
 def user_profile(request):
     user = request.user
@@ -615,6 +620,18 @@ def user_profile(request):
         'profile': profile,  # template içinde formda kullanmak için gerekli
         'password_form': password_form,
     }
+    rewards = UserCouponReward.objects.filter(user=request.user).select_related('coupon')
+    available_coupons = Coupon.objects.all()
+    user_points, _ = UserPoint.objects.get_or_create(user=request.user)
+    already_has_ids = list(rewards.values_list('coupon_id', flat=True))
+
+    context.update({
+        'rewards': rewards,
+        'available_coupons': available_coupons,
+        'user_points': user_points,
+        'already_has_ids': already_has_ids,
+    })
+
 
     return render(request, 'user_profile.html', context)
 
@@ -690,3 +707,219 @@ def add_product_to_session(request, product_id):
 
     next_url = request.GET.get("next", "/forum/")
     return redirect(next_url)
+
+
+MAX_REPORTS = 3  # Eşik sayısı
+REPORT_PENALTY_THRESHOLD = 3  # Kaç farklı kullanıcıdan şikayet gelirse puan düşsün
+REPORT_PENALTY_POINTS = 5    # Ceza olarak kaç puan düşülsün
+def report_thread(request, thread_id):
+    if not request.user.is_authenticated:
+        return redirect('/giris-yap/?next=' + request.path)
+
+    thread = get_object_or_404(Thread, id=thread_id)
+
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+
+        # Aynı kullanıcı zaten şikayet ettiyse tekrar oluşturma
+        already_reported = Report.objects.filter(
+            reporter=request.user,
+            report_type='thread',
+            thread=thread
+        ).exists()
+
+        if not already_reported:
+            Report.objects.create(
+                reporter=request.user,
+                report_type='thread',
+                thread=thread,
+                reason=reason
+            )
+
+            # ✅ Şikayet yeni bir kullanıcıdan geldiyse ceza uygula
+            try:
+                penalize_user(thread.user, REPORT_PENALTY_POINTS)
+                PointHistory.objects.create(
+                    user=thread.user,
+                    action='report_penalty',
+                    points=REPORT_PENALTY_POINTS,
+                    content_type='thread',
+                    object_id=thread.id
+                )
+                print("Yeni şikayet → Ceza uygulandı")
+            except Exception as e:
+                print("Ceza puanı verirken hata:", e)
+
+        # Gizleme sınırını geçtiyse başlığı gizle
+        report_count = Report.objects.filter(
+            thread=thread,
+            report_type='thread',
+            status='pending'
+        ).values('reporter').distinct().count()
+
+        if report_count >= MAX_REPORTS and not thread.is_hidden:
+            thread.is_hidden = True
+            thread.save(update_fields=['is_hidden'])
+            print("Başlık gizlendi")
+
+        return redirect("thread_detail", thread_id=thread.id)
+
+    return render(request, 'report_form.html', {'object': thread, 'type': 'thread'})
+
+
+def report_reply(request, reply_id):
+    if not request.user.is_authenticated:
+        return redirect('/giris-yap/?next=' + request.path)
+
+    reply = get_object_or_404(Reply, id=reply_id)
+
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+        Report.objects.create(
+            reporter=request.user,
+            report_type='reply',
+            reply=reply,
+            reason=reason
+        )
+        return redirect("thread_detail", thread_id=reply.thread.id)
+
+    return render(request, 'report_form.html', {'object': reply, 'type': 'reply'})
+
+# forum/views.py içindeki forum_page fonksiyonu içinde başlık oluşturduktan sonra:
+
+# Puan sistemi
+from .models import UserPoint, PointHistory
+
+
+
+from django.shortcuts import redirect, get_object_or_404
+from django.http import HttpResponseForbidden
+
+from .models import Reply, UserPoint, PointHistory  # model yolunu kendi projen göre ayarla
+
+def mark_best_reply(request, reply_id):
+    if not request.user.is_authenticated:
+        return redirect(f'/giris-yap/?next={request.path}')
+
+    reply = get_object_or_404(Reply, id=reply_id)
+    thread = reply.thread
+
+    if request.user != thread.user:
+        return HttpResponseForbidden("Bu işlem sadece başlığı açan kişi tarafından yapılabilir.")
+
+    # Önceki en iyi cevap varsa kaldır ve puanı geri al
+    old_best = Reply.objects.filter(thread=thread, is_best=True).first()
+
+    if old_best:
+        if old_best.id == reply.id:
+            # Toggle: aynı cevap yeniden seçildiyse kaldır
+            old_best.is_best = False
+            old_best.save()
+            add_points(old_best.user, 'reply_best', -10, related_reply=old_best)
+            return redirect('thread_detail', thread_id=thread.id)
+
+        # Farklı cevabı en iyi yaparken öncekini kaldır
+        old_best.is_best = False
+        old_best.save()
+        add_points(old_best.user, 'reply_best', -10, related_reply=old_best)
+
+    # Yeni cevabı en iyi olarak ata
+    reply.is_best = True
+    reply.save()
+    add_points(reply.user, 'reply_best', 10, related_reply=reply)
+
+    return redirect('thread_detail', thread_id=thread.id)
+
+# views.py
+from django.contrib.auth.decorators import login_required
+from .models import UserCouponReward
+
+@login_required
+def my_coupons(request):
+    user = request.user
+    rewards = UserCouponReward.objects.filter(user=user).select_related('coupon', 'rank')
+    user_points, _ = UserPoint.objects.get_or_create(user=user)  # 👈 bu satır düzeltildi
+    available_coupons = Coupon.objects.all()
+    already_has_ids = list(rewards.values_list('coupon_id', flat=True))
+
+    if request.method == 'POST':
+        coupon_id = request.POST.get('coupon_id')
+        try:
+            coupon = Coupon.objects.get(id=coupon_id)
+        except Coupon.DoesNotExist:
+            return render(request, 'my_coupons.html', {'error': 'Kupon bulunamadı.'})
+
+        # Yetersiz puan kontrolü
+        if user_points.total_points < coupon.required_points:
+            return render(request, 'my_coupons.html', {
+                'error': 'Yetersiz puan.',
+                'user_points': user_points,
+                'rewards': rewards,
+                'available_coupons': available_coupons
+            })
+
+        # Zaten alınmış mı?
+        if UserCouponReward.objects.filter(user=request.user, coupon=coupon).exists():
+            return render(request, 'my_coupons.html', {
+                'error': 'Bu kuponu zaten aldınız.',
+                'user_points': user_points,
+                'rewards': rewards,
+                'available_coupons': available_coupons
+            })
+
+        # Ödülü oluştur
+        UserCouponReward.objects.create(
+            user=request.user,
+            coupon=coupon
+        )
+
+        # Puan düş
+        user_points.total_points -= coupon.required_points
+        user_points.save()
+
+        return redirect('my_coupons')
+
+    return render(request, 'my_coupons.html', {
+        'user_points': user_points,
+        'rewards': rewards,
+        'available_coupons': available_coupons
+    })
+
+
+def add_points(user, action, points, related_reply=None):
+    user_points, _ = UserPoint.objects.get_or_create(user=user)
+    user_points.total_points += points
+    user_points.rank_points += points
+    user_points.save()
+    user_points.update_rank()
+
+    PointHistory.objects.create(
+        user=user,
+        action=action,
+        points=points,
+        related_reply=related_reply  # varsa kaydedilir
+    )
+
+def penalize_user(user, penalty_points):
+    user_points, _ = UserPoint.objects.get_or_create(user=user)
+
+    user_points.total_points -= penalty_points      # kupon için de düşüyorsa buna dokun
+    user_points.rank_points -= penalty_points        # rütbeyi etkileyen kısım, önemli
+    user_points.save()
+    user_points.update_rank()
+
+    PointHistory.objects.create(
+        user=user,
+        action='report_penalty',
+        points=-penalty_points
+    )
+
+def redeem_coupon(user, coupon, cost):
+    user_points = UserPoint.objects.get(user=user)
+    if user_points.total_points >= cost:
+        user_points.total_points -= cost
+        user_points.save()
+        PointHistory.objects.create(user=user, action='coupon_redeem', points=-cost)
+        UserCouponReward.objects.create(user=user, coupon=coupon)
+        return True
+    return False
