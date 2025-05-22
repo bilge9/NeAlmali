@@ -151,6 +151,7 @@ class Thread(models.Model):
     dislike_count = models.IntegerField(default=0)
     related_threads = models.ManyToManyField('self', blank=True)
     is_hidden = models.BooleanField(default=False)
+    products = models.ManyToManyField(Product, blank=True)
 
     def __str__(self):
         return self.title
@@ -233,13 +234,28 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    
     address = models.CharField(max_length=255, default='Adres girilmedi')
     phone = models.CharField(max_length=20, default='Telefon girilmedi')
     note = models.TextField(blank=True, default='')
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+
+    # 🔽 Kupon sistemi eklemeleri:
+    coupon = models.ForeignKey('Coupon', null=True, blank=True, on_delete=models.SET_NULL)
+    coupon_used = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.username} - {self.get_status_display()} - {self.created_at.strftime('%Y-%m-%d')}"
+
+    def get_total_price(self):
+        total = sum(item.get_total_price() for item in self.items.all())
+        if self.coupon_used and self.coupon:
+            total -= self.coupon.discount_amount
+            if total < 0:
+                total = 0
+        return total
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
@@ -249,8 +265,6 @@ class OrderItem(models.Model):
 
     def get_total_price(self):
         return self.quantity * self.price_at_order_time
-
-
 
 class Report(models.Model):
     REPORT_TYPE_CHOICES = [
@@ -324,7 +338,7 @@ class UserCouponReward(models.Model):
     rank = models.ForeignKey('Rank', on_delete=models.CASCADE, null=True, blank=True )
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
     rewarded_at = models.DateTimeField(auto_now_add=True)
-
+    is_used = models.BooleanField(default=False)
     class Meta:
         unique_together = ('user', 'coupon')  # Her kullanıcıya aynı rütbeden bir kez verilir
 

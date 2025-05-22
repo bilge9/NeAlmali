@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
+{% block title %}NeAlmalı - Sepet{% endblock %}
 
 {% block link %}
     <link rel="stylesheet" href="{% static 'css/cart.css' %}">
@@ -24,6 +24,7 @@
 {% block content %}
   <div class="container">
     <h2>Sepetim ({{ cart.items.count }} Ürün)</h2>
+
 
     {% if items %}
       <div class="cart-items">
@@ -61,18 +62,37 @@
       </div>
 
       <div class="summary">
-        <h3>Sipariş Özeti</h3>
-        <p>Ürünün Toplamı: <span>{{ total }} TL</span></p>
-        <p>Kargo Toplam: <span>44,99 TL</span></p>
-        <p>Kargo İndirimi: <span>-44,99 TL</span></p>
+    <h3>Sipariş Özeti</h3>
+    <p>Ürünlerin Toplamı: <span>{{ total }} TL</span></p>
+
+    {% if applied_discount %}
+        <p>Kupon İndirimi: <span>-{{ applied_discount }} TL</span></p>
         <hr>
-        <p class="total">Toplam: <span>{{ total }} TL</span></p>
+        <p class="total"><strong>İndirimli Toplam:</strong> <span>{{ total_after_discount }} TL</span></p>
+    {% else %}
+        <hr>
+        <p class="total"><strong>Toplam:</strong> <span>{{ total }} TL</span></p>
+    {% endif %}
+        <form method="post" action="{% url 'apply_coupon' %}">
+          {% csrf_token %}
+          <label for="coupon">Kupon Seç:</label>
+          <select name="coupon_id">
+            {% for reward in user_rewards %}
+              <option value="{{ reward.coupon.id }}">
+                {{ reward.coupon.code }} - {{ reward.coupon.discount_amount }}₺
+              </option>
+            {% endfor %}
+          </select>
+          <button type="submit">Kuponu Uygula</button>
+        </form>
+
         <form method="post" action="{% url 'complete_order' %}">
             {% csrf_token %}
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#orderModal">
               Siparişi Tamamla
             </button>
         </form>
+  
       </div>
     
     {% else %}
