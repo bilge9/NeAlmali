@@ -26,7 +26,7 @@ urlpatterns = [
     path('sikayet/cevap/<int:reply_id>/', views.report_reply, name='report_reply'),
     path('reply/<int:reply_id>/best/', views.mark_best_reply, name='mark_best_reply'),
        # diğer URL'ler
-    path('kuponlarim/', views.my_coupons, name='my_coupons'),
+   
     path('help/', views.help, name='help'),
 
 
@@ -42,6 +42,7 @@ urlpatterns = [
     path('favorites/add/<int:product_id>/', views.add_to_favorites, name='add_to_favorites'),
     path('favorites/remove/<int:product_id>/', views.remove_from_favorites, name='remove_from_favorites'),
     path('favorites/', views.favorite_list, name='favorite_list'),
+    path('apply-coupon/', views.apply_coupon, name='apply_coupon'),
 
     #profile
     path('seller/profile/', views.seller_profile, name='seller_profile'),

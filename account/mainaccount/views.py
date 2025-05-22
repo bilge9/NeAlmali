@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Attribute, ProductAttributeValue, ProductImage, SellerProfile,  Category, ForumCategory, Thread, Reply, ThreadVote, Report, UserPoint, Coupon, Cart, CartItem, Favorite, UserProfile, Order, OrderItem, ProductReview
+from .models import Product, Attribute, ProductAttributeValue, ProductImage, SellerProfile,  Category, ForumCategory, Thread, Reply, ThreadVote, Report, UserPoint, Coupon, UserCouponReward ,Cart, CartItem, Favorite, UserProfile, Order, OrderItem, ProductReview
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
 from .forms import ProductReviewForm, ProductForm
@@ -17,6 +17,8 @@ from django.urls import reverse
 from datetime import datetime, timezone
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from .models import UserCouponReward
 
 def index(request):
     return render(request, 'index.html')
@@ -472,16 +474,37 @@ def category_threads(request, category_id):
 
 #Sepetim sayfası
 
-
+@login_required
 def cart_detail(request):
     cart = Cart.objects.get(user=request.user)
     items = cart.items.select_related('product').all()
     total = sum(item.get_total_price() for item in items)
+
+    # 🔹 Kullanıcının kuponları
+    user_rewards = UserCouponReward.objects.filter(user=request.user, is_used=False)
+
+    # 🔹 Session'dan uygulanmış kuponu kontrol et
+    coupon_id = request.session.get('applied_coupon_id')
+    applied_discount = 0
+    total_after_discount = total
+
+    if coupon_id:
+        try:
+            coupon = Coupon.objects.get(id=coupon_id)
+            applied_discount = coupon.discount_amount
+            total_after_discount = total - applied_discount
+        except Coupon.DoesNotExist:
+            applied_discount = 0
+
     return render(request, 'cart_detail.html', {
         'cart': cart,
         'items': items,
-        'total': total
+        'total': total,
+        'user_rewards': user_rewards,
+        'applied_discount': applied_discount,
+        'total_after_discount': total_after_discount,
     })
+
 
 @login_required
 def add_to_cart(request, product_id):
@@ -584,94 +607,118 @@ def help(request):
 def user_profile(request):
     user = request.user
     profile, created = UserProfile.objects.get_or_create(user=user)
+    password_form = PasswordChangeForm(user=request.user)
 
-    # Profil güncelleme formu gönderildiyse
+    # Kullanıcının puan bilgisi
+    user_points, _ = UserPoint.objects.get_or_create(user=user)
+
+    # POST işlemleri
     if request.method == 'POST':
-         # Şifre değişikliği formu doluysa
+        # 1. Şifre değiştirme
         if 'old_password' in request.POST and 'new_password1' in request.POST:
             password_form = PasswordChangeForm(user=request.user, data=request.POST)
             if password_form.is_valid():
                 user = password_form.save()
-                update_session_auth_hash(request, user)  # Kullanıcının oturumu açık kalsın
+                update_session_auth_hash(request, user)
                 messages.success(request, "Şifre başarıyla değiştirildi.")
-                return redirect('user_profile')
             else:
-                messages.error(request, "Şifre değiştirme başarısız. Lütfen bilgileri kontrol edin. Olası hatalar: Eski şifre yanlış, yeni şifreler eşleşmiyor, yeni şifre yeterince güçlü değil vb.")
-                
-        else:
-            # User modeli bilgileri
-            user.first_name = request.POST.get('first_name', '')
-            user.last_name = request.POST.get('last_name', '')
-            user.email = request.POST.get('email', '')
-            user.username = request.POST.get('email', '')
+                messages.error(request, "Şifre değiştirme başarısız.")
+            return redirect('user_profile')
+
+        # 2. Kupon alma
+        elif 'coupon_id' in request.POST:
+            coupon_id = request.POST.get('coupon_id')
+            try:
+                coupon = Coupon.objects.get(id=coupon_id)
+            except Coupon.DoesNotExist:
+                messages.error(request, 'Kupon bulunamadı.')
+                return redirect('user_profile')
+
+            if user_points.total_points < coupon.required_points:
+                messages.error(request, 'Yetersiz puan.')
+                return redirect('user_profile')
+
+            if UserCouponReward.objects.filter(user=user, coupon=coupon).exists():
+                messages.error(request, 'Bu kuponu zaten aldınız.')
+                return redirect('user_profile')
+
+            UserCouponReward.objects.create(user=user, coupon=coupon)
+            user_points.total_points -= coupon.required_points
+            user_points.save()
+            PointHistory.objects.create(user=user, action='coupon_redeem', points=-coupon.required_points)
+
+            messages.success(request, 'Kupon başarıyla alındı.')
+            return redirect('user_profile')
+
+        # 3. Profil güncelleme
+        elif 'email' in request.POST or 'first_name' in request.POST:
+            email = request.POST.get('email', '').strip()
+            if email:
+                user.email = email
+                user.username = email
+            user.first_name = request.POST.get('first_name', user.first_name)
+            user.last_name = request.POST.get('last_name', user.last_name)
             user.save()
 
-            # UserProfile bilgileri
-            profile.nickname = request.POST.get('nickname', '')
-            profile.phone = request.POST.get('phone', '')
-            profile.address = request.POST.get('address', '')
-            profile.avatar = request.POST.get('avatar', '')
+            profile.nickname = request.POST.get('nickname', profile.nickname)
+            profile.phone = request.POST.get('phone', profile.phone)
+            profile.address = request.POST.get('address', profile.address)
+            profile.avatar = request.POST.get('avatar', profile.avatar)
             profile.save()
 
-            messages.success(request, "Profiliniz başarıyla güncellendi.")
+            messages.success(request, "Profil güncellendi.")
+            return redirect('user_profile')
 
-            return redirect('user_profile')  # Formdan sonra sayfayı yenile
-
-    password_form = PasswordChangeForm(user=request.user)
-
-    # Siparişler (tamamlananlar)
-    completed_orders = Order.objects.filter(user=user, status='completed').order_by('-created_at')
-
-   # Sepettekiler yerine beklemede olan sipariş ürünleri
-    pending_orders = Order.objects.filter(user=user, status='pending').order_by('-created_at')
-
-    now = datetime.now(timezone.utc)
-    pending_order_items = []
-
-    for order in pending_orders:
-        items = order.items.select_related('product')
-        for item in items:
-            delta = now - order.created_at
-            days = delta.days
-            hours = delta.seconds // 3600
-            minutes = (delta.seconds % 3600) // 60
-            duration_str = f"{days} gün {hours} saat {minutes} dakika"
-            
-            # item + bekleme süresini birlikte dict olarak ekle
-            pending_order_items.append({
-                'item': item,
-                'duration': duration_str
-            })
-
-    # Ürün yorumları
-    reviews = ProductReview.objects.filter(user=user).select_related('product')
-
-    # Forum başlıkları
-    threads = Thread.objects.filter(user=user).order_by('-created_at')
-
-    context = {
-        'user': user,
-        'completed_orders': completed_orders,
-        'pending_order_items': pending_order_items,
-        'reviews': reviews,
-        'threads': threads,
-        'profile': profile,  # template içinde formda kullanmak için gerekli
-        'password_form': password_form,
-    }
-    rewards = UserCouponReward.objects.filter(user=request.user).select_related('coupon')
+    # GET isteği için veriler
+    rewards = UserCouponReward.objects.filter(user=user).select_related('coupon')
     available_coupons = Coupon.objects.all()
-    user_points, _ = UserPoint.objects.get_or_create(user=request.user)
     already_has_ids = list(rewards.values_list('coupon_id', flat=True))
 
-    context.update({
+    # Bekleyen sipariş ürünleri
+    pending_items = OrderItem.objects.filter(
+        order__user=user,
+        order__status='pending'
+    ).select_related('product', 'order')
+
+    pending_order_items = []
+    for item in pending_items:
+        delta = timezone.now() - item.order.created_at
+        days = delta.days
+        hours = delta.seconds // 3600
+        minutes = (delta.seconds % 3600) // 60
+        duration_str = f"{days} gün {hours} saat {minutes} dakika"
+        pending_order_items.append({'item': item, 'duration': duration_str})
+
+    # ✅ Tamamlanan siparişler
+    completed_orders = Order.objects.filter(user=user, status='completed').order_by('-created_at')
+
+    # ✅ Ürün yorumları
+    reviews = ProductReview.objects.filter(user=user).select_related('product')
+
+    # ✅ Forum başlıkları
+    threads = Thread.objects.filter(user=user).order_by('-created_at')
+
+    return render(request, 'user_profile.html', {
+        'user': user,
+        'profile': profile,
+        'password_form': password_form,
+        'user_points': user_points,
         'rewards': rewards,
         'available_coupons': available_coupons,
-        'user_points': user_points,
         'already_has_ids': already_has_ids,
+        'pending_order_items': pending_order_items,
+        'completed_orders': completed_orders,
+        'reviews': reviews,
+        'threads': threads,
     })
 
 
-    return render(request, 'user_profile.html', context)
+from django.shortcuts import get_object_or_404
+from django.db import transaction
+from .models import Coupon, UserPoint, PointHistory
+
+from django.utils import timezone
+from .models import Coupon, PointHistory, UserPoint
 
 @login_required
 def complete_order(request):
@@ -682,6 +729,22 @@ def complete_order(request):
         address = request.POST.get('address')
         phone = request.POST.get('phone')
         note = request.POST.get('note', '')
+        
+        # 🔹 Session'dan kupon ID'si alınıyor (eğer kullanıcı uyguladıysa)
+        coupon_id = request.session.get('applied_coupon_id')
+        coupon = None
+        discount_amount = 0
+        user_coupon_reward = None  # → Kullanıcıya ait kuponu da takip edeceğiz
+
+        if coupon_id:
+            try:
+                coupon = Coupon.objects.get(id=coupon_id)
+                discount_amount = coupon.discount_amount
+
+                # 🔹 Kullanıcının bu kupona ait reward kaydını al
+                user_coupon_reward = UserCouponReward.objects.get(user=request.user, coupon=coupon, is_used=False)
+            except (Coupon.DoesNotExist, UserCouponReward.DoesNotExist):
+                coupon = None  # kupon geçersizse iptal
 
         if not address or not phone:
             messages.error(request, "Adres ve telefon bilgileri zorunludur.")
@@ -691,24 +754,47 @@ def complete_order(request):
             messages.warning(request, "Sepetinizde ürün yok.")
             return redirect('cart_detail')
 
-        order = Order.objects.create(
-            user=request.user,
-            address=address,
-            phone=phone,
-            note=note,
-            status='pending'
-        )
+        # Kullanıcının puanı
+        user_point = get_object_or_404(UserPoint, user=request.user)
 
-        for item in cart_items:
-            OrderItem.objects.create(
-                order=order,
-                product=item.product,
-                quantity=item.quantity,
-                price_at_order_time=item.product.price
+        # 🔹 Toplam fiyat hesapla
+        total_price = sum(item.product.price * item.quantity for item in cart_items)
+        total_price -= discount_amount
+
+        with transaction.atomic():
+            # 🔹 Siparişi oluştur
+            order = Order.objects.create(
+                user=request.user,
+                address=address,
+                phone=phone,
+                note=note,
+                status='pending',
+                coupon=coupon if coupon else None,
+                coupon_used=True if coupon else False,
+                total_price=total_price,
+                discount_amount=discount_amount
             )
 
-        cart_items.delete()
-        messages.success(request, "Siparişiniz alındı. Onay sürecine geçildi.")
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    quantity=item.quantity,
+                    price_at_order_time=item.product.price,
+                )
+
+            # 🔹 Kupon kullanıldıysa is_used = True yap
+            if user_coupon_reward:
+                user_coupon_reward.is_used = True
+                user_coupon_reward.save()
+
+            # 🔹 Sepeti temizle
+            cart_items.delete()
+
+            # 🔹 Session'dan kuponu kaldır
+            request.session.pop('applied_coupon_id', None)
+
+        messages.success(request, "Siparişiniz başarıyla oluşturuldu.")
         return redirect('shopping')
 
     return redirect('cart_detail')
@@ -869,59 +955,8 @@ def mark_best_reply(request, reply_id):
     return redirect('thread_detail', thread_id=thread.id)
 
 # views.py
-from django.contrib.auth.decorators import login_required
-from .models import UserCouponReward
 
-@login_required
-def my_coupons(request):
-    user = request.user
-    rewards = UserCouponReward.objects.filter(user=user).select_related('coupon', 'rank')
-    user_points, _ = UserPoint.objects.get_or_create(user=user)  # 👈 bu satır düzeltildi
-    available_coupons = Coupon.objects.all()
-    already_has_ids = list(rewards.values_list('coupon_id', flat=True))
 
-    if request.method == 'POST':
-        coupon_id = request.POST.get('coupon_id')
-        try:
-            coupon = Coupon.objects.get(id=coupon_id)
-        except Coupon.DoesNotExist:
-            return render(request, 'my_coupons.html', {'error': 'Kupon bulunamadı.'})
-
-        # Yetersiz puan kontrolü
-        if user_points.total_points < coupon.required_points:
-            return render(request, 'my_coupons.html', {
-                'error': 'Yetersiz puan.',
-                'user_points': user_points,
-                'rewards': rewards,
-                'available_coupons': available_coupons
-            })
-
-        # Zaten alınmış mı?
-        if UserCouponReward.objects.filter(user=request.user, coupon=coupon).exists():
-            return render(request, 'my_coupons.html', {
-                'error': 'Bu kuponu zaten aldınız.',
-                'user_points': user_points,
-                'rewards': rewards,
-                'available_coupons': available_coupons
-            })
-
-        # Ödülü oluştur
-        UserCouponReward.objects.create(
-            user=request.user,
-            coupon=coupon
-        )
-
-        # Puan düş
-        user_points.total_points -= coupon.required_points
-        user_points.save()
-
-        return redirect('my_coupons')
-
-    return render(request, 'my_coupons.html', {
-        'user_points': user_points,
-        'rewards': rewards,
-        'available_coupons': available_coupons
-    })
 
 
 def add_points(user, action, points, related_reply=None):
@@ -975,3 +1010,36 @@ def seller_profile_detail(request, pk):
         'products': products,
     }
     return render(request, 'seller_profile_detail.html', context)
+
+from django.shortcuts import redirect
+from django.contrib import messages
+
+
+def apply_coupon(request):
+    if request.method == 'POST':
+        coupon_id = request.POST.get('coupon_id')
+        try:
+            reward = UserCouponReward.objects.get(user=request.user, coupon_id=coupon_id)
+            request.session['applied_coupon_id'] = reward.coupon.id  # Kuponu session’a ata
+            messages.success(request, 'Kupon sepete uygulandı.')
+        except UserCouponReward.DoesNotExist:
+            messages.error(request, 'Bu kuponu kullanamazsınız.')
+    return redirect('cart_detail')  # sepet sayfasının url adı
+
+def get_cart_total(request):
+    from .models import Coupon  # gerekiyorsa import et
+    from .models import CartItem  # veya ilgili yerden
+    
+    cart_items = CartItem.objects.filter(user=request.user)
+    total = sum(item.product.price * item.quantity for item in cart_items)
+
+    coupon_id = request.session.get('applied_coupon_id')
+    if coupon_id:
+        try:
+            coupon = Coupon.objects.get(id=coupon_id)
+            total = max(0, total - coupon.discount_amount)
+        except Coupon.DoesNotExist:
+            pass
+
+    return total
+

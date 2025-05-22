@@ -109,20 +109,10 @@
                 {% endwith %}
             </div>
 
-            <!-- Forumda Paylaş -->
-            <div class="mb-3">
-                {% if existing_ids %}
-                {% with existing_ids|join:"&product_id=" as query_string %}
-                    <a href="{% url 'add_product_to_session' product.id %}" class="btn btn-primary w-100">
-                    Forumda Paylaş
-                    </a>
-                {% endwith %}
-                {% else %}
-                <a href="{% url 'forum_page' %}?product_id={{ product.id }}" class="btn btn-primary w-100">
+            <!--forumda yorum--><!--burayı artık ellemeyinlütfen çalışan kısım bulütfen -->
+                <a href="{% url 'add_product_to_session' product.id %}?next={% url 'forum_page' %}" class="btn btn-primary w-100 mb-3">
                     Forumda Paylaş
                 </a>
-                {% endif %}
-            </div>
 
             <!-- Sepete Ekle -->
             <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark w-100 mb-3">
