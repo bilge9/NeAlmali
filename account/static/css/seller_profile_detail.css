@@ -1,0 +1,81 @@
+body{
+    margin-top: 100px !important;
+}
+.image-container {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+  border-radius: 1rem;
+}
+
+.image-container img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+  border-radius: 1rem;
+}
+
+.image-container .hover-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+.image-container:hover .main-img {
+  opacity: 0;
+}
+
+.image-container:hover .hover-img {
+  opacity: 1;
+}
+
+.product-wrap {
+  margin-bottom: 30px;
+  padding: 0 10px;
+  width: 100%;
+}
+
+.product-wrap a {
+    text-decoration: none;
+    color: #000;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: transform 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-card:hover {
+  transform: scale(1.02);
+}
+
+.product-info {
+  padding: 15px;
+}
+
+.product-info .rating {
+  font-size: 0.9rem;
+  color: #ffc107;
+}
+
+.urun-baslik {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 5px 0;
+  color: #333;
+}
+
+.urun-fiyat {
+  font-weight: bold;
+  color: #ef0909;
+  font-size: 1rem;
+}

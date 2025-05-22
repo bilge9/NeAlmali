@@ -1,9 +1,13 @@
 body{
+<<<<<<< HEAD
   margin-top:10px;
   background-position: center;
   background-size: cover;
   background-image: url('/static/pictures/bckgrn3dd.png') ;
   background-color: #fffae5a1!important;
+=======
+  background-color: #fffef7 !important;
+>>>>>>> 688c222ff38d18e76554ff409b5188e100a98212
 }
 .search-bar {
   position: relative;
@@ -72,8 +76,13 @@ body{
 
   /* Sağ taraf başlıkları kart gibi */
   .sidebar-section {
+<<<<<<< HEAD
     color: #ffffff;
     background: #ffddb3;
+=======
+    color: #0e0e0e;
+    background: #8ea3b8;
+>>>>>>> 688c222ff38d18e76554ff409b5188e100a98212
     border: 1px solid #a092b1;
     border-radius: 8px;
     padding: 15px;
@@ -128,8 +137,17 @@ body{
 }
 
   .forum-container{
+<<<<<<< HEAD
     background-color: transparent;
     padding: 60px;
+=======
+    background-color: #e9eff5;
+    margin: 100px;
+    margin-top: 320px;
+    border: 1px solid #fff0f0;
+    border-radius:8px;
+    padding: 10px;
+>>>>>>> 688c222ff38d18e76554ff409b5188e100a98212
   }
     
   .banner-container {
@@ -224,7 +242,12 @@ body{
 }
 
 .list-group-item:hover {
+<<<<<<< HEAD
   background-color: #ffbec3 !important; 
+=======
+   
+  background-color:#8bbeda; ; /* lavanta rengi hover */
+>>>>>>> 688c222ff38d18e76554ff409b5188e100a98212
 }
 
 /* Başlık (h5) */

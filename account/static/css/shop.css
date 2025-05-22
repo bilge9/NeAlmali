@@ -1,9 +1,16 @@
 body {
     font-family: sans-serif;
+<<<<<<< HEAD
     background-color: #efefef!important;
     background-position: center;
     background-size: cover;
+=======
+   
+>>>>>>> 688c222ff38d18e76554ff409b5188e100a98212
     margin: 0;
+    background-image:url('/static/pictures/.png') ;
+    background-position: center;
+    background-size: cover;
     padding: 0;
 }
 
