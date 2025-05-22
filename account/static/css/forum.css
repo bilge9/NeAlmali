@@ -1,5 +1,9 @@
 body{
-  background-color: #ebe0ff !important;
+  margin-top:10px;
+  background-position: center;
+  background-size: cover;
+  background-image: url('/static/pictures/bckgrn3dd.png') ;
+  background-color: #fffae5a1!important;
 }
 .search-bar {
   position: relative;
@@ -69,7 +73,7 @@ body{
   /* Sağ taraf başlıkları kart gibi */
   .sidebar-section {
     color: #ffffff;
-    background: #48385b;
+    background: #ffddb3;
     border: 1px solid #a092b1;
     border-radius: 8px;
     padding: 15px;
@@ -82,31 +86,67 @@ body{
     font-size: 1.2rem;
     margin-bottom: 15px;
   }
+  a.active {
+  font-weight: bold;
+  color: #333333;
+  text-decoration: underline;
+}
+.filter-card {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.filter-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.btn-group .btn.active {
+  text-decoration: none;
+  background-color: #fbb5bd;
+  color: white;
+  font-weight: 500;
+  border-color: #ffa8a8;
+}
+.btn-group .btn{
+  color: white;
+  background-color: #c4c4c4;
+  border-color: #868686;
+  
+}
+.btn-group .btn:hover{
+  color: white;
+  background-color: #fbb5bd;
+  border-color: #ffa8a8;
+}
+
+.p-4 {
+    padding: 1.5rem !important;
+    background-color: #fff2e4;
+}
+
   .forum-container{
-    background-color: #ffe8ef;
-    margin: 100px;
-    margin-top: 320px;
-    border: 1px solid #bda8d7;
-    border-radius:8px;
-    padding: 10px;
+    background-color: transparent;
+    padding: 60px;
   }
     
   .banner-container {
-    position: fixed;
+    
     top: 0;
     left: 0;
     right: 0;
-    z-index: 3;
     height: 300px;
-    background-color: white;
+    background-color: transparent;
     overflow: hidden;
     transition: height 0.05s ease;
   }
   
   .banner-container img {
-    width: 100%;
+    width: 1500px;
     height: 100%;
-    max-height: 300px;
+    max-height: 500px;
     object-fit: cover;
     display: block;
   }
@@ -176,15 +216,15 @@ body{
 }
 /* Tüm liste öğesine arka plan ve hover efekti */
 .list-group-item {
-  background-color: #f9f9ff; /* açık morumsu beyaz */
-  border: 1px solid #ddd;
+  background-color: #fff2e4 !important;
+  border: 1px solid #fff2e4;
   border-radius: 8px;
   margin-bottom: 12px;
   transition: background-color 0.3s ease;
 }
 
 .list-group-item:hover {
-  background-color: #33337d; /* lavanta rengi hover */
+  background-color: #ffbec3 !important; 
 }
 
 /* Başlık (h5) */
@@ -206,6 +246,8 @@ body{
 
 /* Badge (kategori etiketi) */
 .list-group-item .badge {
+  color: black;
+  background-color: rgb(155, 208, 255);
   font-size: 0.75rem;
   padding: 5px 10px;
 }

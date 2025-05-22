@@ -1,6 +1,8 @@
 body {
     font-family: sans-serif;
-    background-color: #fff2f2 !important;
+    background-color: #efefef!important;
+    background-position: center;
+    background-size: cover;
     margin: 0;
     padding: 0;
 }
@@ -61,7 +63,6 @@ body {
 .shop-hero {
     margin-top: 0px;
     width: 100%;
-    height: 250px; /* İstediğin yüksekliğe göre ayarla */
     display: flex;
     align-items: center; /* Sadece dikey ortalama */
 }
@@ -70,8 +71,8 @@ body {
     height: auto;
 }
     
-  /*üst kategori kısmı*/
 .kategori-container {
+    margin-top: -300px;
     display: flex;
     justify-content: center;
     gap: 30px;
@@ -85,13 +86,13 @@ body {
 }
     
 .kategori-kutu {
-    background-color: none;
+    background-color:#ffffff7c;
     color: #1b0701;
     padding: 14px 45px;
     border-radius: 15px;
     font-size: 14.5px bold;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease;
 }
     
 .kategori-kutu:hover {
@@ -154,7 +155,7 @@ body {
     max-width: 1400px;
     margin: 50px auto; /* Ortalar */
     overflow: hidden;
-    background:#fff1e3;
+    background:#5c5c5c93;
     padding: 10px 0;
     border-radius: 10px;
     height: 400px; /* İstersen arttır */
@@ -303,7 +304,7 @@ body {
   
   /*altta öne çıkarılan kategoriler kısmı için*/
 .kategori-alt-wrap {
-    background-color: #ffeaea; 
+    background-color: #e3e3e3; 
     padding: 45px 25px;
     margin-top: 50px ;
     margin-bottom: 0px ;

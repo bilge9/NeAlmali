@@ -34,7 +34,7 @@
 
 {% block content %}
   <div id="banner" class="banner-container"><!--banner resmi-->
-    <img src={% static "pictures/forumbanner.png"%} alt="banner">
+    <img src={% static "pictures/bannerr.png"%} alt="banner">
   </div>
   <div class="category-bar" id="category-bar">
   <!-- Kategoriler buraya gelecek -->
@@ -64,12 +64,6 @@
         {% endfor %}
         </p>
       {% endif %}
-  <div class="sort-options">
-    <strong>Sıralama:</strong>
-    <a href="?sort=likes{% for c in selected_categories %}&category={{ c }}{% endfor %}" {% if sort_by == "likes" %}class="active"{% endif %}>En Beğenilen</a> |
-    <a href="?sort=views{% for c in selected_categories %}&category={{ c }}{% endfor %}" {% if sort_by == "views" %}class="active"{% endif %}>En Çok Görüntülenen</a> |
-    <a href="?{% for c in selected_categories %}category={{ c }}&{% endfor %}" {% if not sort_by %}class="active"{% endif %}>En Yeniler</a>
-  </div>
 
       <!-- Sol taraf: Ana başlık listesi (geniş) -->
       <div class="col-md-8 border-end-md forum-ana-kisim">
@@ -112,7 +106,7 @@
         <!-- Kategoriler -->
           <div class="d-flex flex-wrap gap-1">
             {% for category in thread.categories.all %}
-              <a href="{% url 'category_threads' category.id %}" class="badge rounded-pill text-bg-primary text-decoration-none" onclick="event.stopPropagation();">
+              <a href="{% url 'category_threads' category.id %}" class="badge rounded-pill text text-decoration-none" onclick="event.stopPropagation();">
                 {{ category.name }}
               </a>
             {% endfor %}
@@ -122,87 +116,32 @@
       </div>
     </div>
     {% endfor %}
-
-          <div id="dahaFazlaBaslik" style="display: none;">
-            <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">Pythonda Veri Tabanı Bağlantısı</h5>
-            
-                <!-- Kategori ve Tarih sağ üstte -->
-                <div class="d-flex align-items-center gap-2">
-                  
-                  <small class="text-muted">1 hafta önce</small>
-                </div>
-              </div>
-            
-              <p class="mb-1">Python ile MySQL bağlantısı nasıl kurulur? En iyi yöntemler nelerdir?</p>
-            
-              <div class="d-flex justify-content-between align-items-center">
-                <small class="text-body-secondary">by DeveloperX</small>
-            
-                <!-- Beğeni ve Görüntülenme sağ altta -->
-                <div class="d-flex align-items-center gap-3 text-muted">
-                  <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
-                  <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
-                  <span><i class="bi bi-eye"></i> 156</span>
-                  <span class="badge rounded-pill bg-primary">Python</span>
-                </div>
-              </div>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action"> <!--bu tasarım butonların yerini gösteriyo-->
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">Pythonda Veri Tabanı Bağlantısı</h5>
-            
-                <!-- Kategori ve Tarih sağ üstte -->
-                <div class="d-flex align-items-center gap-2">
-                  
-                  <small class="text-muted">1 hafta önce</small>
-                </div>
-              </div>
-            
-              <p class="mb-1">Python ile MySQL bağlantısı nasıl kurulur? En iyi yöntemler nelerdir?</p>
-            
-              <div class="d-flex justify-content-between align-items-center">
-                <small class="text-body-secondary">by DeveloperX</small>
-            
-                <!-- Beğeni ve Görüntülenme sağ altta -->
-                <div class="d-flex align-items-center gap-3 text-muted">
-                  <span><i class="bi bi-hand-thumbs-up"></i> 12</span>
-                  <span><i class="bi bi-hand-thumbs-down"></i> 3</span>
-                  <span><i class="bi bi-eye"></i> 156</span>
-                  <span class="badge rounded-pill bg-primary">Python</span>
-                </div>
-              </div>
-            </a>
-      
-          </div>
-  
-        </div>
+  </div>
       </div>
   
       <!-- Sağ taraf: Son Açılanlar ve Çok Görüntülenenler (dar) -->
+
       <div class="col-md-4">
-  
-        <div class="sidebar-section">
-          <h4>Son Açılan Başlıklar</h4>
-          <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action">Django Forms Kullanımı</a>
-            <a href="#" class="list-group-item list-group-item-action">API ile Veri Çekmek</a>
-            <a href="#" class="list-group-item list-group-item-action">CSS Grid vs Flexbox</a>
-          </div>
-        </div>
-  
-        <div class="sidebar-section">
-          <h4>Çok Görüntülenenler</h4>
-          <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action">Python İleri Seviye</a>
-            <a href="#" class="list-group-item list-group-item-action">Django ile E-Ticaret Sitesi</a>
-            <a href="#" class="list-group-item list-group-item-action">HTML5 Yeni Özellikler</a>
-          </div>
-        </div>
-      </div>
+  <div class="filter-card p-4 mb-4">
+    <h5 class="mb-3">Sıralama</h5>
+    <div class="btn-group d-flex flex-column gap-2" role="group">
+      <a href="?sort=likes{% for c in selected_categories %}&category={{ c }}{% endfor %}" 
+         class="btn {% if sort_by == 'likes' %}active{% endif %}">
+        <i class="bi bi-chat-heart-fill"></i> En Beğenilen
+      </a>
+      <a href="?sort=views{% for c in selected_categories %}&category={{ c }}{% endfor %}" 
+         class="btn {% if sort_by == 'views' %}active{% endif %}">
+        <i class="bi bi-eye-fill"></i> En Çok Görüntülenen
+      </a>
+      <a href="?{% for c in selected_categories %}category={{ c }}&{% endfor %}" 
+         class="btn {% if not sort_by %}active{% endif %}">
+        <i class="bi bi-clock-fill"></i> En Yeniler
+      </a>
     </div>
   </div>
+</div>
+
+  
 
   {% if threads.has_other_pages %}
   <nav aria-label="Sayfalama">
@@ -377,26 +316,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     //forum kısmının kodları bunun için dediğim gibi karışıklık olmasın diye forum.js açmadım şuan
-const banner = document.getElementById('banner');
-let ticking = false;
 
-function updateBanner() {
-  const scrollY = window.scrollY;
-
-  let height = 300 - scrollY;
-  if (height < 80) height = 80;
-  if (height > 300) height = 300;
-
-  banner.style.height = `${height}px`;
-  ticking = false;
-}
-
-window.addEventListener('scroll', () => {
-  if (!ticking) {
-    window.requestAnimationFrame(updateBanner);
-    ticking = true;
-  }
-});
 </script>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
