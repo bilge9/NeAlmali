@@ -28,9 +28,8 @@
     
 {% block content %}
     <div class="shop-hero"><!--banner resmi-->
-      <img src={% static "pictures/bannerhop.png"%} alt="banner" class="shop-banner" style="width: 100%;">
+      <img src={% static "pictures/shopbanner.png"%} alt="banner" class="shop-banner" style="width: 100%;">
     </div>
-
     <div class="kategori-container"><!-- kategoriler kısmı-->
       {% for category in categories %}
         {% if not category.parent %}
@@ -108,27 +107,19 @@
   
    <div class="campaign-container"><!-- indirimler,kampanyalar,kuponlar,çeşitli koleksiyonlar ve daha fazlasını belirtmek üzere oluştrduğumuz görsel kısım-->
     <div class="campaign">
-      <a href="#">
-        <div class="zoom2">
-          <p>indirim</p>
-         
-        </div>
-      </a>
+      <div class="zoom2">
+          <img src="{% static 'pictures/shopcam.png' %}" alt="indirim" class="indirim-img" style="width: 100%; height: 100%;">
+        </div>
     </div>
     <div class="campaign">
-      <a href="#">
-        <div class="zoom2">
-          <p>en yeniler</p>
-          
-        </div>
-      </a>
+      <div class="zoom2">
+          <img src="{% static 'pictures/shopcam2.png' %}" alt="indirim" class="indirim-img" style="width: 100%; height: 100%;">
+        </div>
     </div>
     <div class="campaign">
-      <a href="#">
-        <div class="zoom2">
-          <p>özel koleksiyonlar</p>
-        </div>
-      </a>
+      <div class="zoom2">
+          <img src="{% static 'pictures/shopcam3.png' %}" alt="indirim" class="indirim-img" style="width: 100%; height: 100%;">
+        </div>
     </div>
    </div>
   
@@ -136,7 +127,6 @@
   <div class="kategori-alt-wrap"><!--öne çıkarılan kategorileri sayfanın altında gösteriyoruz-->
     <div class="kateg-cap">
       <h5>öne çıkan kategoiler</h5>
-      <p>metin metin metin metin</p>
     </div> 
     <div class="kategori-alt-container">
       {% for category in highlighted_categories %}

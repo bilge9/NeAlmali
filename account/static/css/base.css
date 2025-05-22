@@ -1,6 +1,6 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: #f8f8f8;
+    background: #f5f3f4;
     margin: 0; 
     padding: 0;
 }
@@ -21,6 +21,7 @@ width: 100%;
 
 /* navbar */
 .topnav {
+    background-color: #b2b2b24e;
 overflow: visible;
 display: flex;
 align-items: center;

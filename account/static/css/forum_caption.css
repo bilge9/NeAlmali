@@ -1,246 +1,264 @@
+/* Genel stil */
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f2f2f2;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .main-container {
-    display: flex;
-    max-width: 1200px;
-    margin: 40px auto;
-    gap: 20px;
-    padding: 0 20px;
-  }
-  
-  .left-content {
-    flex: 2;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-  }
-  
-  .right-sidebar {
-    flex: 1;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    height: fit-content;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  }
-  
-  .thread-title {
-    font-size: 22px;
-    margin-bottom: 20px;
-  }
-  
-  .reply-box {
-    display: flex;
-    gap: 15px;
-    background: #f9f9f9;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  }
-  
-  .reply-box.nested {
-    background: #e8f0fe;
-    font-size: 14px;
-    padding: 10px;
-    border-left: 3px solid #3b82f6;
-  }
-  
-  .user-info {
-    width: 60px;
-    text-align: center;
-  }
-  
-  .user-info img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-  }
-  
-  .username {
-    font-weight: bold;
-    font-size: 14px;
-  }
-  
-  .reply-content {
-    flex: 1;
-  }
-  
-  .reply-actions {
-    margin-top: 10px;
-    display: flex;
-    gap: 8px;
-  }
-  
-  .reply-actions button {
-    background: #e1e1e1;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  
-  .reply-actions button:hover {
-    background: #ccc;
-  }
-  
-  .bottom-reply-form {
-    margin-top: 30px;
-  }
-  
-  .bottom-reply-form textarea {
-    width: 100%;
-    height: 100px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    resize: vertical;
-  }
-  
-  .bottom-reply-form button {
-    margin-top: 10px;
-    padding: 10px 16px;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  
-  .topic-list {
-    list-style: none;
-    padding-left: 0;
-  }
-  
-  .topic-list li {
-    margin-bottom: 10px;
-  }
-  
-  .topic-list a {
-    text-decoration: none;
-    color: #3b82f6;
-  }
-  
-  .popup-reply-form {
-    position: relative;
-    margin-top: 10px;
-    width: 90%;
-    max-width: 600px;
-    background: #f7f7f7;
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 8px;
-    margin-left: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  
-  .popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .close-btn {
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: #444;
-  }
-  
-  .reply-reference {
-    background-color: #eaeaea;
-    padding: 10px;
-    border-left: 4px solid #ccc;
-    margin-bottom: 8px;
-    border-radius: 4px;
-    font-size: 13px;
-  }
-  
-  .nested-reply-box {
-    background-color: #f0f0f0;
-    padding: 8px 12px;
-    margin-bottom: 10px;
-    border-left: 4px solid #bbb;
-    border-radius: 6px;
-    font-size: 14px;
-    margin-top: 5px;
-  }
-  .reply-quote {
-    background: #bcddf1;
-    border-left: 3px solid #53ade5;
-    padding: 10px;
-    margin: 6px 0 6px 15px;  /* Soldan girinti için */
-    font-style: italic;
-    font-size: 0.9em;
-    border-radius: 6px;
-  }
-  
-  
-  .reply-reference-inner {
-    margin-bottom: 8px;
-  }
-  
-  .dropdown-form {
-    position: absolute;
-    top: 60px;
-    left: 40px;
-    background: #fff;
-    padding: 16px;
-    border: 1px solid #ccc;
-    width: 400px;
-    z-index: 999;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-  .dropdown-form .form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .dropdown-form textarea,
-  .dropdown-form input,
-  .dropdown-form select {
-    width: 100%;
-    margin-top: 10px;
-    padding: 8px;
-    font-size: 1em;
-  }
-  .dropdown-form button {
-    margin-top: 10px;
-    width: 100%;
-    padding: 10px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-  }
-  
-.urun-kart {
-  display: flex;
-  align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 8px;
-  max-width: 300px;
-  background-color: #f7f7f7;
-  margin-top: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f6fa;
+  margin: 0;
+  padding: 0;
+  color: #000000;
 }
+
+a {
+  color: #a8d9ff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.main-container {
+  display: flex;
+  max-width: 1200px;
+  margin: 40px auto;
+  gap: 20px;
+  padding: 0 15px;
+}
+
+/* Sol içerik */
+.left-content {
+  flex: 3;
+  background: #fff7f4;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.thread-title {
+  font-size: 26px;
+  margin-bottom: 10px;
+  color: #2d3436;
+}
+
+/* Ürün kartları */
+.urun-kart {
+  border: 1px solid #dfe6e9;
+  border-radius: 10px;
+  padding: 10px;
+  width: 160px;
+  background-color: #fafafa;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.urun-kart:hover {
+  transform: scale(1.03);
+}
+
 .urun-kart-img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 4px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.urun-kart-detay {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+/* Oy butonları */
+.vote-form {
+  display: inline-block;
   margin-right: 10px;
 }
-.urun-kart-detay {
+
+.vote-form button {
+  background-color: #78c4ff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.vote-form button.btn-danger {
+  background-color: #ff7373;
+}
+
+.vote-form button:hover {
+  opacity: 0.9;
+}
+
+/* Yanıt kutuları */
+.reply-box {
+  background-color: #ffe4e4;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+}
+
+.reply-box .user-info {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.reply-box img {
+  border-radius: 50%;
+}
+
+.reply-box .username {
+  font-weight: bold;
+  color: #2d3436;
+}
+
+.reply-content {
+  margin-top: 8px;
+}
+
+.reply-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+}
+
+.reply-actions button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Alt cevap formu */
+.bottom-reply-form textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  margin-top: 10px;
+}
+
+.bottom-reply-form button {
+  background-color: #00b894;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.bottom-reply-form button:hover {
+  opacity: 0.9;
+}
+
+/* Popup cevap kutusu */
+.popup-reply-form {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  z-index: 999;
+  width: 300px;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup-header span {
+  font-weight: bold;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.popup-reply-form textarea {
+  width: 100%;
+  height: 80px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.popup-reply-form button {
+  margin-top: 10px;
+  background-color: #6c5ce7;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Sağ sidebar */
+.right-sidebar {
+  flex: 1;
+  background: #fff7f4;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  height: fit-content;
+}
+
+.topic-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.topic-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.topic-list li:last-child {
+  border-bottom: none;
+}
+
+.new_topic {
+  margin-top: 20px;
+}
+
+.new_topic button {
+  background-color: #fbb5bd;;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.new_topic button:hover {
+  opacity: 0.9;
+}
+
+/* Bildirim */
+.reply-notification {
+  color: #00b894;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* İç içe cevap kutuları */
+.reply-reference-inner {
+  background-color: #dfe6e9;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
 }
