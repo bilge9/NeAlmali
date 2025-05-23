@@ -43,25 +43,29 @@
     <div class="row">
       
       <form method="get" action="" class="filter-form"><!--filtreleme ve sıralama işlemleri buraya eklendi-->
-        <fieldset>
-            <legend>Kategorilere Göre Filtrele:</legend>
-            {% for category in categories %}
-                <label>
-                    <input type="checkbox" name="category" value="{{ category.id }}"
-                        {% if category.id in selected_categories %}checked{% endif %}>
-                    {{ category.name }}
-                </label><br>
-            {% endfor %}
-        </fieldset>
-        <button type="submit">Filtrele</button>
-      </form>
+         <fieldset>
+            <legend>Kategorilere Göre Filtrele</legend>
+            <div class="checkbox-group">
+              {% for category in categories %}
+                <label class="checkbox-item">
+                  <input type="checkbox" name="category" value="{{ category.id }}"
+                    {% if category.id in selected_categories %}checked{% endif %}>
+                  <span>{{ category.name }}</span>
+                </label>
+              {% endfor %}
+              <button type="submit" class="filter-button">Filtrele</button>
+            </div>
+            
+          </fieldset>
+        </form>
+        
       {% if selected_categories %}
-        <p><strong>Seçili kategoriler:</strong>
-        {% for category in categories %}
+        <p class="selected-categories"><strong>Seçili kategoriler:</strong>
+          {% for category in categories %}
             {% if category.id in selected_categories %}
-                {{ category.name }}{% if not forloop.last %}, {% endif %}
+              <span class="category-tag">{{ category.name }}</span>
             {% endif %}
-        {% endfor %}
+          {% endfor %}
         </p>
       {% endif %}
 
@@ -92,7 +96,15 @@
           <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-2">
 
       <!-- Kullanıcı -->
-          <small class="text-body-secondary">by {{ thread.user.username }}</small>
+           <small class="text-body-secondary">
+              by {% if thread.user.userprofile.nickname %}
+                    {{ thread.user.userprofile.nickname }}
+                {% elif thread.user.first_name %}
+                    {{ thread.user.first_name }}
+                {% else %}
+                    {{ thread.user.username }}
+                {% endif %}
+            </small>
 
           <div class="d-flex flex-column align-items-md-end gap-2">
 
@@ -140,7 +152,8 @@
     </div>
   </div>
 </div>
-
+</div>
+    </div>
   
 
   {% if threads.has_other_pages %}

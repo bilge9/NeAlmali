@@ -127,26 +127,31 @@ body{
     background-color: #fff2e4;
 }
 
-  .forum-container{
-    background-color: transparent;
-    padding: 60px;
-  }
+  .forum-container {
+  position: relative;
+  top: -300px; /* banner içine taşması için */
+  z-index: 2;
+  background-color: #e4e4e4ad;
+  margin: 0 auto;
+  border-radius: 12px;
+  padding: 40px 20px;
+  max-width: 1500px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
     
   .banner-container {
-    
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 300px;
-    background-color: transparent;
+    position: relative;
+    width: 100%;
+    height: 400px;
     overflow: hidden;
+    z-index: 1;
+    background-color: transparent;
     transition: height 0.05s ease;
   }
   
   .banner-container img {
-    width: 1500px;
+    width: 100%;
     height: 100%;
-    max-height: 500px;
     object-fit: cover;
     display: block;
   }
@@ -372,4 +377,77 @@ h5 {
   background-color: #e8d5f0;
   color: #000;
   border-radius: 6px;
+}
+
+.filter-form {
+  max-width: 800px;
+}
+
+.filter-form fieldset {
+  border: none;
+  padding: 0;
+}
+
+.filter-form legend {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 5px;
+}
+
+.checkbox-item {
+  background-color: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.checkbox-item:hover {
+  background-color: #e2e8f0;
+}
+
+.checkbox-item input[type="checkbox"] {
+  accent-color: #2563eb; /* Mavi checkbox */
+  transform: scale(1.2);
+}
+
+.filter-button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filter-button:hover {
+  background-color: #1e40af;
+}
+
+.selected-categories {
+  font-size: 16px;
+  color: #333;
+}
+
+.category-tag {
+  display: inline-block;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 14px;
+  margin: 4px 4px 0 0;
 }

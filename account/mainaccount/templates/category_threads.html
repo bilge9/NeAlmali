@@ -1,21 +1,208 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-  <h2>{{ category.name }} Kategorisi</h2>
-<ul>
-    {% for thread in threads %}
-        <li><a href="{% url 'thread_detail' thread_id=thread.id %}?category_id={{ category.id }}">{{ thread.title }}</a></li>
-    {% empty %}
-    <li>Bu kategoride henüz başlık yok.</li>
-    {% endfor %}
-</ul>
+{% extends "base.html" %}
+{%load static%}
+{% load image_filters %}
 
+{% block title %}NeAlmalı - Shopping{% endblock %}
+    
+{% block link %}
+    
+{% endblock %}  
+
+{% block message %}
+    {% include 'message_box.html' %}
+{% endblock message %}
+
+{%block search-bar%}
+<!-- Arama çubuğu -->
+ <form method="get" action="{% url 'shop_categories' category_id=1 %}">
+  <div class="search-bar">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Ürün ara..." value="{{ query }}">
+      <button class="input-group-text" type="submit">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </div>
+</form>
+{%endblock search-bar%}
+    
+{% block content %}
+  <style>
     
 
-</body>
-</html>
+    body {
+      background-color: #f9fafb;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      margin-top: 80px;
+      max-width: 1200px;
+      padding: 0 15px;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 2.2rem;
+      color: #1e293b;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #3b82f6;
+      padding-bottom: 8px;
+      text-transform: capitalize;
+    }
+
+    .list-group-item {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 20px 25px;
+      margin-bottom: 24px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .list-group-item:hover {
+      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+      transform: translateY(-3px);
+      background-color: #f0f9ff;
+    }
+
+    .d-flex.w-100.justify-content-between.flex-wrap {
+      align-items: center;
+    }
+
+    h5.mb-1.text-dark {
+      font-weight: 600;
+      font-size: 1.4rem;
+      margin: 0;
+      color: #0f172a;
+    }
+
+    small.text-muted {
+      font-size: 0.9rem;
+      color: #64748b !important;
+    }
+
+    .text-body-secondary {
+      font-size: 0.9rem;
+      color: #475569 !important;
+    }
+
+    .d-flex.flex-column.flex-md-row.justify-content-between.align-items-start.gap-2 {
+      align-items: center;
+    }
+
+    /* Sayılar (like/dislike/view) */
+    .d-flex.align-items-center.gap-3.text-muted.flex-wrap span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.95rem;
+      color: #475569;
+      user-select: none;
+      transition: color 0.25s ease;
+    }
+
+    .d-flex.align-items-center.gap-3.text-muted.flex-wrap span:hover {
+      color: #3b82f6;
+    }
+
+    /* Kategoriler (badge) */
+    .d-flex.flex-wrap.gap-1 a.badge {
+      font-weight: 600;
+      font-size: 0.8rem;
+      padding: 6px 14px;
+      border-radius: 50px;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    .d-flex.flex-wrap.gap-1 a.badge:hover {
+      background-color: #2563eb !important;
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 576px) {
+      .d-flex.flex-column.flex-md-row.justify-content-between.align-items-start.gap-2 {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+      }
+      .d-flex.flex-column.align-items-md-end.gap-2 {
+        align-items: flex-start !important;
+      }
+    }
+
+  </style>
+
+<div class="container">
+
+  <h2>{{ category.name }} Kategorisi</h2>
+
+  {% if threads %}
+    <div class="list-group">
+      {% for thread in threads %}
+        <div class="list-group-item" onclick="location.href='{% url 'thread_detail' thread.id %}'">
+
+          <!-- Başlık ve Tarih -->
+          <div class="d-flex w-100 justify-content-between flex-wrap">
+            <h5 class="mb-1 text-dark">{{ thread.title }}</h5>
+            <small class="text-muted">{{ thread.created_at|timesince }} önce</small>
+          </div>
+
+          <!-- Kullanıcı + Beğeni/Görüntülenme + Kategoriler -->
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-2">
+
+            <!-- Kullanıcı -->
+            <small class="text-body-secondary">
+              by
+              {% if thread.user.userprofile.nickname %}
+                {{ thread.user.userprofile.nickname }}
+              {% elif thread.user.first_name %}
+                {{ thread.user.first_name }}
+              {% else %}
+                {{ thread.user.username }}
+              {% endif %}
+            </small>
+
+            <div class="d-flex flex-column align-items-md-end gap-2">
+
+              <!-- Sayılar -->
+              <div class="d-flex align-items-center gap-3 text-muted flex-wrap">
+                <span><i class="bi bi-hand-thumbs-up"></i> {{ thread.like_count }}</span>
+                <span><i class="bi bi-hand-thumbs-down"></i> {{ thread.dislike_count }}</span>
+                <span><i class="bi bi-eye"></i> {{ thread.views }}</span>
+              </div>
+
+              <!-- Kategoriler -->
+              <div class="d-flex flex-wrap gap-1">
+                {% for cat in thread.categories.all %}
+                  <a href="{% url 'category_threads' cat.id %}" class="badge rounded-pill text-bg-primary text-decoration-none" onclick="event.stopPropagation();">
+                    {{ cat.name }}
+                  </a>
+                {% endfor %}
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info" role="alert">
+      Bu kategoride henüz başlık yok.
+    </div>
+  {% endif %}
+
+</div>
+{% endblock content %}
+
+
+
