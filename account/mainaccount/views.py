@@ -19,6 +19,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from .models import UserCouponReward
+from django.db.models import Count
 
 def index(request):
     return render(request, 'index.html')
@@ -248,7 +249,7 @@ from django.contrib import messages
 from django.db.models import Q
 
 def forum_page(request):
-    categories = ForumCategory.objects.all()
+    categories = ForumCategory.objects.annotate(thread_count=Count('threads'))
     products = Product.objects.all()
 
     # Arama sorgusu

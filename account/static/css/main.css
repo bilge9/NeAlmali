@@ -1,3 +1,6 @@
+.index-page .topnav {
+    background-color: transparent !important;
+}
 
 .carousel-indicators button {
   background-color: #1b0122;

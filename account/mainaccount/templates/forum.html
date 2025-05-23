@@ -177,6 +177,10 @@
     </ul>
   </nav>
 {% endif %}
+    </div>
+  
+
+
 
 <h3>Test: Seçilen Ürünler</h3>
 <ul>
@@ -187,7 +191,7 @@
   {% endfor %}
 </ul>
     <!-- forum sayfasında, başlık açma -->
-  <div class="container my-5">
+  <div class="container ">
     <div class="row justify-content-center">
       <div class="col-md-8">
         <h3 class="mb-3">Yeni Başlık Oluştur</h3>
@@ -264,40 +268,24 @@
   </div>
 
 
-  <div class="category-grid"><!--burası alt kategoriler kutu haklinde fazla koymuştum onları sileriz-->
+ <div class="category-grid">
+  {% for category in categories %}
     <div class="category-card">
-      <img src="moda.png" alt="Moda" class="category-image">
-      <div class="category-title">Moda</div>
-      <div class="category-info">342 başlık açıldı</div>
+      <a href="{% url 'category_threads' category.id %}" class="category-link">
+        {% if category.image %}
+          <img src="{{ category.image.url }}" alt="{{ category.name }}" class="category-image">
+        {% else %}
+          <img src="{% if category.image %}{{ category.image.url }}{% else %}{% static 'pictures/imageplaceholder.png' %}{% endif %}" alt="{{ category.name }}" class="category-image">
+        {% endif %}
+      <div class="category-title">{{ category.name }}</div>
+      <div class="category-info">{{ category.thread_count }} başlık açıldı</div>
     </div>
-    <div class="category-card">
-      <img src="pictures/moda.png" alt="alışveriş" class="category-image">
-      <div class="category-title">Alışveriş&İlanlar</div>
-      <div class="category-info">342 başlık açıldı</div>
-    </div>
-    <div class="category-card">
-      <img src="pictures/moda.png" alt="alışveriş" class="category-image">
-      <div class="category-title">Alışveriş&İlanlar</div>
-      <div class="category-info">342 başlık açıldı</div>
-    </div>
-    <div class="category-card">
-      <img src={% static 'pictures/imageplaceholder.png' %} alt="alışveriş" class="category-image">
-      <div class="category-title">Alışveriş&İlanlar</div>
-      <div class="category-info">342 başlık açıldı</div>
-    </div>
-    <div class="category-card">
-      <img src="moda.jpg" alt="Moda" class="category-image">
-      <div class="category-title">Hobi&yaşam</div>
-      <div class="category-info">342 başlık açıldı</div>
-    </div>
-    <div class="category-card">
-      <img src="moda.jpg" alt="Moda" class="category-image">
-      <div class="category-title">Destek&yardım</div>
-      <div class="category-info">342 başlık açıldı</div>
-    </div>
-  
-    <!-- Daha fazla kategori ekleyebilirsin -->
-  </div>
+  {% empty %}
+    <p>Hiç kategori bulunamadı.</p>
+  {% endfor %}
+</div>
+
+
   <script>// sayfayı yenildeiğinde geir dönmeye çalışınca doğru yere yönlendirmesi için
 document.addEventListener('DOMContentLoaded', function () {
     const clearBtn = document.getElementById('clear-selected-products');
