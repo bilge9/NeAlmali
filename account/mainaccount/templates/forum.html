@@ -97,7 +97,7 @@
 
       <!-- Kullanıcı -->
            <small class="text-body-secondary">
-              by {% if thread.user.userprofile.nickname %}
+              Oluşturan: {% if thread.user.userprofile.nickname %}
                     {{ thread.user.userprofile.nickname }}
                 {% elif thread.user.first_name %}
                     {{ thread.user.first_name }}
@@ -153,10 +153,7 @@
   </div>
 </div>
 </div>
-    </div>
-  
-
-  {% if threads.has_other_pages %}
+{% if threads.has_other_pages %}
   <nav aria-label="Sayfalama">
     <ul class="pagination justify-content-center">
       {% if threads.has_previous %}
@@ -177,17 +174,10 @@
     </ul>
   </nav>
 {% endif %}
-
-<h3>Test: Seçilen Ürünler</h3>
-<ul>
-  {% for product in selected_products %}
-    <li>{{ product.name }}</li>
-  {% empty %}
-    <li>Seçilen ürün yok</li>
-  {% endfor %}
-</ul>
+    </div>
+  
     <!-- forum sayfasında, başlık açma -->
-  <div class="container my-5">
+  <div class="container ">
     <div class="row justify-content-center">
       <div class="col-md-8">
         <h3 class="mb-3">Yeni Başlık Oluştur</h3>
