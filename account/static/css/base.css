@@ -34,12 +34,26 @@ margin-left: 20px;
 margin-right: 20px;
 }
 
+.nav-links .btn{
+    border-color: #000;
+    border-radius: 30px;
+    background-color: #f3e6eba1;
+}
+
+.nav-links a{
+    text-decoration: none;
+    color: #000000;
+
+}
+
 .search-bar {
-position: relative;
-display: flex;
-align-items: center;
-justify-content: center;
-flex-grow: 0.325;
+    background-color: #f3e6eba1;
+    border-radius: 30px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 0.325;
 }
 
 .search-bar input {

@@ -204,80 +204,71 @@
 <!-- Gizli Cevap Formu -->
 
 
+<script>
+  let insertAfterElement = null;
 
-  <script>//gpt bunları böyle yapmış  bende yapıştımırmışım 
-    let insertAfterElement = null;
-    
-    // Ana formdan başlığa direkt cevap ekleme
-    function handleMainReply(event) {
-      event.preventDefault();
-      const textarea = document.getElementById('mainReplyText');
-      const text = textarea.value.trim();
-      if (!text) return;
-    
-      const newReply = createReplyBox("me", text);
-      document.getElementById('replyList').appendChild(newReply);
-      textarea.value = '';
-    
-      const notification = document.getElementById('replyNotification');
-      notification.style.display = 'block';
-      setTimeout(() => {
-        notification.style.display = 'none';
-      }, 4000);
-    
-      // Veri tabanı için gönderme yapılabilir:
-      // fetch('/api/yorum-ekle/', {...});
-    }
-    
-    // Cevapla butonuna tıklandığında kutu göster
-    function showReplyForm(username, btn) {
+  // Ana formdan başlığa direkt cevap ekleme
+  function handleMainReply(event) {
+    event.preventDefault();
+
+    const textarea = document.getElementById('mainReplyText');
+    const text = textarea.value.trim();
+    if (!text) return;
+
+    const newReply = createReplyBox("me", text);
+    document.getElementById('replyList').appendChild(newReply);
+    textarea.value = '';
+
+    showReplyNotification();
+
+    // Veritabanına gönderme işlemi burada yapılabilir
+    // fetch('/api/yorum-ekle/', {...});
+  }
+
+  // Cevap kutusunu göster
+  function showReplyForm(username, btn) {
     const parentBox = btn.closest('.reply-box');
-    const messageHTML = getFullReplyChain(parentBox);
+    const quotedHTML = getFullReplyChain(parentBox);
 
     const form = document.getElementById('popupReplyForm');
-    const replyRef = document.getElementById('replyRef');
-    const textarea = document.getElementById('replyText');
-    insertAfterElement = parentBox;
-
-    replyRef.innerHTML = messageHTML;
-    textarea.value = `@${username} `;
+    document.getElementById('replyRef').innerHTML = quotedHTML;
+    document.getElementById('replyText').value = `@${username} `;
     form.style.display = 'block';
-    textarea.focus();
-    }
 
-    function closeReplyPopup() {
-     document.getElementById('popupReplyForm').style.display = 'none';
-     document.getElementById('replyRef').innerHTML = '';
-     document.getElementById('replyText').value = '';
-     insertAfterElement = null;
-    }
-    
-    function getFullReplyChain(replyElement) {
+    insertAfterElement = parentBox;
+    document.getElementById('replyText').focus();
+  }
+
+  // Cevap kutusunu kapat
+  function closeReplyPopup() {
+    document.getElementById('popupReplyForm').style.display = 'none';
+    document.getElementById('replyRef').innerHTML = '';
+    document.getElementById('replyText').value = '';
+    insertAfterElement = null;
+  }
+
+  // Referanslı cevap zinciri oluştur
+  function getFullReplyChain(replyElement) {
     if (!replyElement || !replyElement.classList.contains('reply-box')) return '';
 
     const username = replyElement.querySelector('.username')?.innerText || 'Kullanıcı';
     const message = replyElement.querySelector('.reply-content > p')?.innerText || '';
-
-    // Önceki cevabın içindeki cevabı bul (eğer varsa)
     const nested = replyElement.querySelector('.reply-reference-inner');
     const nestedHTML = nested ? nested.innerHTML : '';
 
     return `
       <div class="reply-reference-inner">
-       ${nestedHTML}
+        ${nestedHTML}
         <div class="reply-quote">
           <strong>@${username}</strong> dedi ki:<br />
           ${message}
         </div>
       </div>
     `;
-      }
+  }
 
-
-
-    
-    // Cevapla penceresinden gönderme
-    function submitReply() {
+  // Popup formdan cevabı gönder
+  function submitReply() {
     const textarea = document.getElementById('replyText');
     const text = textarea.value.trim();
     if (!text) return;
@@ -294,11 +285,13 @@
     }
 
     closeReplyPopup();
-      }
 
+    // Veritabanına gönderme işlemi burada yapılabilir
+    // fetch('/api/yorum-ekle/', {...});
+  }
 
-    // Ortak reply kutusu oluşturucu bu önceki replyi de beraberinde tutarak bir verilen replyleri alt alta tutuyo gibi
-    function createReplyBox(username, content, nestedHTML = '') {
+  // Cevap kutusu oluşturucu
+  function createReplyBox(username, content, nestedHTML = '') {
     const reply = document.createElement('div');
     reply.classList.add('reply-box');
     reply.innerHTML = `
@@ -315,10 +308,18 @@
       </div>
     `;
     return reply;
-      }
+  }
 
-    </script>
-    
+  // Bildirim kutusu göster
+  function showReplyNotification() {
+    const notification = document.getElementById('replyNotification');
+    notification.style.display = 'block';
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 4000);
+  }
+</script>
+
 
 </body>
 </html>
