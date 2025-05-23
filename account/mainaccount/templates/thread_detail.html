@@ -1,20 +1,26 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{{ thread.title }}</title>
-  <link rel="stylesheet" href={% static 'css/forum_caption.css'%} />
-</head>
-<body>
+{% extends "base.html" %}
+{%load static%}
+{% load image_filters %}
 
+{% block title %}NeAlmalı - ForumBaşlık{% endblock %}
+    
+{% block link %}
+    <link rel="stylesheet" href={% static 'css/forum_caption.css'%}>
+{% endblock %}    
+  
+{% block message %}
+    {% include 'message_box.html' %}
+{% endblock message %}
+{% block content %}
 <div class="main-container"><!--burdan aşağısı sayfanın genel tasarımı navbar ve kenarları falan doldurulmalı-->
   <!-- Sol: Cevaplar -->
   <div class="left-content">
     <h2 class="thread-title">{{ thread.title }}</h2>
     <p>Oluşturan: {{ thread.user.username }} - {{ thread.created_at|date:"d M Y H:i" }}</p>
     <p>{{ thread.content }}</p>
+    {% if thread.image %}
+  <img src="{{ thread.image.url }}" alt="Konu resmi" style="max-width: 100%; margin-top: 10px;" />
+{% endif %}
     <p>{{ urun.main_image }}</p>
 
         {% if thread.products.all %}
@@ -321,5 +327,4 @@
 </script>
 
 
-</body>
-</html>
+{% endblock  %}  

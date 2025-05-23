@@ -19,7 +19,7 @@ a:hover {
 .main-container {
   display: flex;
   max-width: 1200px;
-  margin: 40px auto;
+  margin: 200px auto;
   gap: 20px;
   padding: 0 15px;
 }

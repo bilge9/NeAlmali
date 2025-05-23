@@ -305,6 +305,7 @@ def forum_page(request):
                 title=title,
                 content=content,
                 user=request.user,
+                image=request.FILES.get('image')
             )
             thread.categories.set(category_ids)
 

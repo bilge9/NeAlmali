@@ -90,7 +90,7 @@
                 </div>
 
                 <h6 class="urun-baslik">{{ product.name }}</h6>
-                <div class="urun-fiyat">${{ product.price }}</div>
+                <div class="urun-fiyat">{{ product.price }} TL</div>
               </div>
             
             </div>
@@ -126,7 +126,7 @@
 
   <div class="kategori-alt-wrap"><!--öne çıkarılan kategorileri sayfanın altında gösteriyoruz-->
     <div class="kateg-cap">
-      <h5>öne çıkan kategoiler</h5>
+      <h5>Öne Çıkan Kategoriler</h5>
     </div> 
     <div class="kategori-alt-container">
       {% for category in highlighted_categories %}

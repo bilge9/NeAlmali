@@ -154,7 +154,8 @@ class Thread(models.Model):
     related_threads = models.ManyToManyField('self', blank=True)
     is_hidden = models.BooleanField(default=False)
     products = models.ManyToManyField(Product, blank=True)
-
+    image = models.ImageField(upload_to='forum_images/', null=True, blank=True)
+    
     def __str__(self):
         return self.title
 

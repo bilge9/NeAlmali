@@ -10,14 +10,16 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #e89cae56; 
+    background-image: url("/static/pictures/u.png");
+    background-position: center;
+    background-size: cover;
 }
 
 .container {
     display: flex;
     width: 800px;
     height: 500px;
-    background: #f890a055; 
+    background: #348486aa; 
     border-radius: 10px;
     overflow: hidden;
 }
@@ -29,13 +31,13 @@ body {
     align-items: center;
     justify-content: center;
     background-color: #f0eefc;
-    padding: 20px;
+
 }
 
 .illustration img {
     width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Form alanı */
@@ -78,7 +80,7 @@ button {
 }
 
 .login-btn {
-    background-color: #ff6699;
+    background-color: #fe98b3;
     color: white;
 }
 
@@ -91,12 +93,34 @@ button {
     padding: 12px;
     text-align: center;
     text-decoration: none; 
-    background-color: #ddd;
+    background-color:#ffffffb3;
     color: black;
     border-radius: 5px;
     width: 100%; 
 }
 .register-btn:hover {
-    background-color: zz#ff6699;
+    background-color: #fe98b3;
     color: white;
+}
+.form-container {
+    position: relative; /* Butonun konumlandırılması için gerekli */
+    padding-top: 50px; /* Butonla içerik çakışmasın */
+}
+
+.back-home-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    background-color: #fe98b3;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.back-home-btn :hover {
+    background-color: #ff3366 !important;
 }

@@ -12,6 +12,7 @@
 
     <title>NeAlmalı - Kayıt Ol</title>
     <link rel="stylesheet" href={% static "css/register.css" %}>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 <body>
 
@@ -19,10 +20,12 @@
 
     <div class="container">
         <div class="illustration">
-            <img src="/resim.jpeg" alt="Görsel">
+            <img src={%static "pictures/register3.png"%} alt="Görsel">
         </div>
         <div class="form-container">
+            
             <h2>Hesap Oluştur</h2>
+            <a href="{% url 'index' %}" class="back-home-btn"><i class="bi bi-house"></i></a>
             <form method="POST">
                 {% csrf_token %}
 

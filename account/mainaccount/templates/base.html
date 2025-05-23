@@ -40,13 +40,12 @@
             </div>
 
             <!-- 🔹 Yeni butonlar burada -->
-            {% if request.resolver_match.url_name != 'index' %}
+            
               <div class="nav-links ms-2 d-flex align-items-center gap-3" style="margin-left: 20px;">
                 <a href="{% url 'shopping' %}" class="btn btn-outline-secondary">Alışveriş</a>
                 <a href="{% url 'forum_page' %}" class="btn btn-outline-secondary">Forum</a>
               </div>
-            {% endif %}
-
+            
             {%block search-bar%}{%endblock search-bar%}
             <!--İkonlar-->
             <div class="icons-container">
