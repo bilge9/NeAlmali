@@ -8,7 +8,7 @@ body {
 }
 
 a {
-  color: #a8d9ff;
+  color: #6aa2cc;
   text-decoration: none;
 }
 
@@ -72,6 +72,7 @@ a:hover {
 }
 
 .vote-form button {
+  margin-top: 20px;
   background-color: #78c4ff;
   color: white;
   border: none;
@@ -92,6 +93,7 @@ a:hover {
 /* Yanıt kutuları */
 .reply-box {
   background-color: #ffe4e4;
+  margin-top: 20px;
   padding: 12px;
   border-radius: 10px;
   margin-bottom: 12px;
@@ -132,6 +134,7 @@ a:hover {
 
 /* Alt cevap formu */
 .bottom-reply-form textarea {
+  background-color: #fff1f2;
   width: 100%;
   height: 100px;
   padding: 10px;
@@ -143,7 +146,7 @@ a:hover {
 
 .bottom-reply-form button {
   background-color: #00b894;
-  color: white;
+  color: rgb(255, 255, 255);
   padding: 8px 16px;
   border: none;
   border-radius: 8px;
@@ -160,7 +163,7 @@ a:hover {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: white;
+  background: rgb(252, 237, 237);
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.15);
@@ -186,6 +189,7 @@ a:hover {
 }
 
 .popup-reply-form textarea {
+  background-color: #fff6f6;
   width: 100%;
   height: 80px;
   margin-top: 10px;
@@ -227,24 +231,6 @@ a:hover {
 
 .topic-list li:last-child {
   border-bottom: none;
-}
-
-.new_topic {
-  margin-top: 20px;
-}
-
-.new_topic button {
-  background-color: #fbb5bd;;
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
-}
-
-.new_topic button:hover {
-  opacity: 0.9;
 }
 
 /* Bildirim */

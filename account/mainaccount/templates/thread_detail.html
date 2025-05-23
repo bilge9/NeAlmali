@@ -15,7 +15,6 @@
     <h2 class="thread-title">{{ thread.title }}</h2>
     <p>Oluşturan: {{ thread.user.username }} - {{ thread.created_at|date:"d M Y H:i" }}</p>
     <p>{{ thread.content }}</p>
-    <img src="{{ urun.main_image.image.url }}" alt="Resim" class="urun-kart-img"><!--başlığa eklenen ürünler nasıl gözükecek-->
     <p>{{ urun.main_image }}</p>
 
         {% if thread.products.all %}
@@ -55,10 +54,6 @@
       <span class="dislike-count">{{ thread.dislike_count }}</span>
     </button>
   </form>
-    <p>👍 {{ thread.like_count }} | 👎 {{ thread.dislike_count }}</p>
-
-  
-  <button onclick="toggleReplyForm()">Cevapla</button>
 
   <div id="replyList" class="reply-list">
     {% for reply in replies %}
@@ -123,10 +118,6 @@
       {% endfor %}
     </ul>
   {% endif %}
-  <div class="new_topic">
-    <button onclick="toggleTopicForm()">+ Yeni Konu</button>
-  </div>
-  </div>
 
   <script>
   document.querySelectorAll('.vote-form').forEach(form => {// beğeni işlemlerinden sonra geri dönülmek istendiğinde artık tek tık yetiyor. ajax kodunu düzelttim.
@@ -320,8 +311,6 @@
         <p>${content}</p>
         <div class="reply-actions">
           <button onclick="showReplyForm('${username}', this)">💬 Cevapla</button>
-          <button>👍 0</button>
-          <button>👎 0</button>
         </div>
       </div>
     `;

@@ -13,6 +13,7 @@ body {
     display: flex;
     max-width: 1300px;
     margin: 70px auto;
+    margin-top: 180px;
     padding: 20px 30px;
     background-color: #fff;
     border-radius: 12px;

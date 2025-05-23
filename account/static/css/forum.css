@@ -260,11 +260,6 @@ body{
   padding: 5px 10px;
 }
 
-/* Yazar ismi */
-.list-group-item small.text-body-secondary {
-  color: #6f42c1; /* mor ton */
-}
-
 .badge {
   font-size: 13px;
   padding: 5px 10px;
@@ -294,15 +289,19 @@ body{
 /* Başlık Açma Formu Stili */
 
 button.custom-btn {
-  background-color: #a55a98;
+  background-color: #e397b8;
   border-color: #9a5d8c;     /* Hover'da kenarlık rengi */
   transform: translateY(-2px); /* Hafif yukarı zıplatma efekti */
   box-shadow: 0 4px 8px rgba(36, 0, 42, 0.15);
 }
 
 /* Başlık açma formunu kutu gibi yapmak için */
+.container{
+  margin-top: -250px;
+}
 .create-topic-form {
-  background-color: #f4ebff !important;
+  margin-top: -500px;
+  background-color: #ffc6cd73 !important;
   border: 1px solid #dee2e6;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -325,14 +324,14 @@ button.custom-btn {
 }
 
 .create-topic-form .btn {
-  background-color: #B76BA3;
+  background-color: #e397b8;
   color: white;
   border: none;
   transition: 0.3s;
 }
 
 .create-topic-form .btn:hover {
-  background-color: #a25694;
+  background-color: #f9a7cb;
 }
 
 h5 {
